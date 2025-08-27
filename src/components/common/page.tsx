@@ -4,7 +4,7 @@ import { Separator } from "../ui/separator";
 
 function Header({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 	return (
-		<header className={cn("flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12", className)} {...props}>
+		<header className={cn("sticky top-0 flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12", className)} {...props}>
 			<div className="flex items-center gap-2 px-4 w-full">
 				<SidebarTrigger className="-ml-1" />
 				<Separator

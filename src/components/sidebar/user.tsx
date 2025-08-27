@@ -29,6 +29,9 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar"
+import { authClient } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function User({
 	user,
@@ -40,6 +43,13 @@ export function User({
 	}
 }) {
 	const { isMobile } = useSidebar()
+	const router = useRouter()
+
+	async function signOut() {
+		await authClient.signOut()
+		toast("Goodbye, see you soon!")
+		router.refresh()
+	}
 
 	return (
 		<SidebarMenu>
@@ -102,7 +112,7 @@ export function User({
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={signOut}>
 							<LogOut />
 							Log out
 						</DropdownMenuItem>

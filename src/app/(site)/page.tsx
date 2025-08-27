@@ -1,17 +1,13 @@
 import { Icons } from "@/components/common/icons";
 import { Page } from "@/components/common/page";
 import { ThemeToggle } from "@/components/common/theme-toggle";
+import { withAuth, WithAuthProps } from "@/components/common/with-auth";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import Image from "next/image";
 
-export default async function Home() {
-	const session = await auth.api.getSession({
-		headers: await headers()
-	})
+interface Props extends WithAuthProps { }
 
+async function Home({ user }: Props) {
 	return (
 		<>
 			<Page.Header>
@@ -30,10 +26,12 @@ export default async function Home() {
 			<Page.Content>
 				<div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 grow">
 					<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-						<pre>{JSON.stringify(session, null, 2)}</pre>
+						<pre>{JSON.stringify(user, null, 2)}</pre>
 					</main>
 				</div>
 			</Page.Content>
 		</>
 	);
 }
+
+export default withAuth(Home)

@@ -1,0 +1,10 @@
+{
+	"sidebar": {
+		"home": "Hjem",
+		"documentation": "Dokumentation",
+		"settings": "Indstillinger"
+	},
+  "home": {
+    "title": "Hej verden!"
+  }
+}

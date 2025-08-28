@@ -16,6 +16,7 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import React from "react"
 
 export function Navigation({
 	items,
@@ -23,7 +24,7 @@ export function Navigation({
 	items: {
 		title: string
 		url: string
-		icon?: LucideIcon
+		icon?: React.JSX.Element
 		items?: {
 			title: string
 			url: string
@@ -45,7 +46,7 @@ export function Navigation({
 							<SidebarMenuItem>
 								<CollapsibleTrigger asChild>
 									<SidebarMenuButton tooltip={item.title}>
-										{item.icon && <item.icon />}
+										{item.icon && item.icon}
 										<span>{item.title}</span>
 										<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
 									</SidebarMenuButton>
@@ -69,7 +70,7 @@ export function Navigation({
 						<SidebarMenuItem key={item.title}>
 							<SidebarMenuButton tooltip={item.title} asChild>
 								<a href={item.url}>
-									{item.icon && <item.icon />}
+									{item.icon && item.icon}
 									<span>{item.title}</span>
 								</a>
 							</SidebarMenuButton>

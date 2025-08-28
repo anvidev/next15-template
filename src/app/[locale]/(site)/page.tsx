@@ -1,26 +1,21 @@
 import { Icons } from "@/components/common/icons";
 import { Page } from "@/components/common/page";
-import { ThemeToggle } from "@/components/common/theme-toggle";
 import { withAuth, WithAuthProps } from "@/components/common/with-auth";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { getTranslations } from "next-intl/server";
 
 interface Props extends WithAuthProps { }
 
 async function Home({ user }: Props) {
+	const t = await getTranslations('home');
 	return (
 		<>
 			<Page.Header>
-				<Page.Title>Home</Page.Title>
+				<Page.Title>{t('title')}</Page.Title>
 				<Page.Actions>
 					<Button size="icon" variant="ghost">
 						<Icons.plus />
 					</Button>
-					<Separator
-						orientation="vertical"
-						className="data-[orientation=vertical]:h-5"
-					/>
-					<ThemeToggle />
 				</Page.Actions>
 			</Page.Header>
 			<Page.Content>

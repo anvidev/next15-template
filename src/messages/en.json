@@ -1,0 +1,10 @@
+{
+	"sidebar": {
+		"home": "Home",
+		"documentation": "Documentation",
+		"settings": "Settings"
+	},
+  "home": {
+    "title": "Hello world!"
+  }
+}

@@ -16,69 +16,66 @@ import {
 	SidebarRail,
 } from "@/components/ui/sidebar"
 import { Icons } from "../common/icons"
-
-const data = {
-	user: {
-		name: "anvi",
-		email: "me@anvi.dev",
-		avatar: "/avatars/shadcn.jpg",
-	},
-	navMain: [
-		{
-			title: "Home",
-			url: "#",
-			icon: Icons.home,
-		},
-		{
-			title: "Documentation",
-			url: "#",
-			icon: BookOpen,
-			items: [
-				{
-					title: "Introduction",
-					url: "#",
-				},
-				{
-					title: "Get Started",
-					url: "#",
-				},
-				{
-					title: "Tutorials",
-					url: "#",
-				},
-				{
-					title: "Changelog",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Settings",
-			url: "#",
-			icon: Icons.settings,
-			items: [
-				{
-					title: "General",
-					url: "#",
-				},
-				{
-					title: "Team",
-					url: "#",
-				},
-				{
-					title: "Billing",
-					url: "#",
-				},
-				{
-					title: "Limits",
-					url: "#",
-				},
-			],
-		},
-	],
-}
+import { useTranslations } from "next-intl"
 
 export function Sidebar({ ...props }: React.ComponentProps<typeof ShadcnSidebar>) {
+	const t = useTranslations("sidebar")
+	const data = {
+		navMain: [
+			{
+				title: t("home"),
+				url: "#",
+				icon: <Icons.home />,
+			},
+			{
+				title: t("documentation"),
+				url: "#",
+				icon: <Icons.sun />,
+				items: [
+					{
+						title: "Introduction",
+						url: "#",
+					},
+					{
+						title: "Get Started",
+						url: "#",
+					},
+					{
+						title: "Tutorials",
+						url: "#",
+					},
+					{
+						title: "Changelog",
+						url: "#",
+					},
+				],
+			},
+			{
+				title: t("settings"),
+				url: "#",
+				icon: <Icons.settings />,
+				items: [
+					{
+						title: "General",
+						url: "#",
+					},
+					{
+						title: "Team",
+						url: "#",
+					},
+					{
+						title: "Billing",
+						url: "#",
+					},
+					{
+						title: "Limits",
+						url: "#",
+					},
+				],
+			},
+		],
+	}
+
 	return (
 		<ShadcnSidebar collapsible="icon" {...props}>
 			<SidebarHeader>
@@ -88,7 +85,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof ShadcnSidebar>
 				<Navigation items={data.navMain} />
 			</SidebarContent>
 			<SidebarFooter>
-				<User user={data.user} />
+				<User />
 			</SidebarFooter>
 			<SidebarRail />
 		</ShadcnSidebar>

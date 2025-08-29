@@ -4,7 +4,7 @@
 		"documentation": "Documentation",
 		"settings": "Settings"
 	},
-  "home": {
-    "title": "Hello world!"
-  }
+	"home": {
+		"title": "Hello world!"
+	}
 }

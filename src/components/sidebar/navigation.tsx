@@ -1,11 +1,10 @@
-"use client"
+'use client'
 
-import { ChevronRight } from "lucide-react"
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from '@/components/ui/collapsible'
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -15,8 +14,9 @@ import {
 	SidebarMenuSub,
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
-import React from "react"
+} from '@/components/ui/sidebar'
+import { ChevronRight } from 'lucide-react'
+import React from 'react'
 
 export function Navigation({
 	items,
@@ -35,25 +35,20 @@ export function Navigation({
 		<SidebarGroup>
 			<SidebarGroupLabel>Navigation</SidebarGroupLabel>
 			<SidebarMenu>
-				{items.map((item) => (
+				{items.map(item =>
 					item.items ? (
-
-						<Collapsible
-							key={item.title}
-							asChild
-							className="group/collapsible"
-						>
+						<Collapsible key={item.title} asChild className='group/collapsible'>
 							<SidebarMenuItem>
 								<CollapsibleTrigger asChild>
 									<SidebarMenuButton tooltip={item.title}>
 										{item.icon && item.icon}
 										<span>{item.title}</span>
-										<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+										<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
 									</SidebarMenuButton>
 								</CollapsibleTrigger>
 								<CollapsibleContent>
 									<SidebarMenuSub>
-										{item.items?.map((subItem) => (
+										{item.items?.map(subItem => (
 											<SidebarMenuSubItem key={subItem.title}>
 												<SidebarMenuSubButton asChild>
 													<a href={subItem.url}>
@@ -75,8 +70,8 @@ export function Navigation({
 								</a>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
-					)
-				))}
+					),
+				)}
 			</SidebarMenu>
 		</SidebarGroup>
 	)

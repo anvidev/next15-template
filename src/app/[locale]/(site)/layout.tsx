@@ -1,20 +1,15 @@
-import React from "react";
+import React from 'react'
 
-import {
-	SidebarInset,
-	SidebarProvider,
-} from "@/components/ui/sidebar"
-import { Sidebar } from "@/components/sidebar/sidebar";
+import { Sidebar } from '@/components/sidebar/sidebar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 export default function SiteLayout({
-	children
+	children,
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<SidebarProvider>
 			<Sidebar />
-			<SidebarInset>
-				{children}
-			</SidebarInset>
+			<SidebarInset>{children}</SidebarInset>
 		</SidebarProvider>
 	)
 }

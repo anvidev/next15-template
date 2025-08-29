@@ -1,5 +1,20 @@
-import { Check, ChevronsUpDown, Eclipse, Home, Languages, LogOut, MessageCircleQuestionMark, Moon, Plus, Settings2, Sparkle, Sun, User, Warehouse } from "lucide-react";
-import React from "react";
+import {
+	Check,
+	ChevronsUpDown,
+	Eclipse,
+	Home,
+	Languages,
+	LogOut,
+	MessageCircleQuestionMark,
+	Moon,
+	Plus,
+	Settings2,
+	Sparkle,
+	Sun,
+	User,
+	Warehouse,
+} from 'lucide-react'
+import React from 'react'
 
 type IconProps = React.HTMLAttributes<SVGElement>
 

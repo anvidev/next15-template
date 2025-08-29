@@ -1,9 +1,9 @@
-import { redirect } from "@/i18n/navigation"
-import { Locale } from "@/i18n/routing"
-import { auth } from "@/lib/auth"
-import { Session, User } from "better-auth"
-import { headers } from "next/headers"
-import React from "react"
+import { redirect } from '@/i18n/navigation'
+import { Locale } from '@/i18n/routing'
+import { auth } from '@/lib/auth'
+import { Session, User } from 'better-auth'
+import { headers } from 'next/headers'
+import React from 'react'
 
 export type WithAuthProps = {
 	user: User
@@ -12,9 +12,11 @@ export type WithAuthProps = {
 }
 
 export function withAuth<P extends WithAuthProps>(
-	WrappedComponent: React.ComponentType<P>
+	WrappedComponent: React.ComponentType<P>,
 ) {
-	type ComponentProps = Omit<P, keyof WithAuthProps> & { params: Promise<{ locale: Locale }> }
+	type ComponentProps = Omit<P, keyof WithAuthProps> & {
+		params: Promise<{ locale: Locale }>
+	}
 
 	return async function AuthenticatedComponent(props: ComponentProps) {
 		const { params, ...restProps } = props

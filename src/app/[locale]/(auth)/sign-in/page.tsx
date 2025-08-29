@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { signIn, signUp } from "@/server/auth";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { signIn, signUp } from '@/server/auth'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function Page() {
 	const router = useRouter()
 	async function signInHandler() {
 		await signIn()
-		toast("Welcome back!")
-		router.replace("/")
+		toast('Welcome back!')
+		router.replace('/')
 	}
 
 	return (

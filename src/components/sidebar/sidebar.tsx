@@ -1,10 +1,6 @@
 "use client"
 
 import * as React from "react"
-import {
-	BookOpen,
-} from "lucide-react"
-
 import { Navigation } from "@/components/sidebar/navigation"
 import { User } from "@/components/sidebar/user"
 import { Logo } from "@/components/sidebar/logo"

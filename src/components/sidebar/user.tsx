@@ -47,7 +47,7 @@ export function User() {
 		}
 	};
 
-	const { isPending, data } = authClient.useSession()
+	const { data } = authClient.useSession()
 
 	async function signOut() {
 		await authClient.signOut()

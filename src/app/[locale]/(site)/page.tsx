@@ -4,9 +4,8 @@ import { withAuth, WithAuthProps } from "@/components/common/with-auth";
 import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 
-interface Props extends WithAuthProps { }
 
-async function Home({ user }: Props) {
+async function Home({ user }: WithAuthProps) {
 	const t = await getTranslations('home');
 	return (
 		<>

@@ -32,6 +32,7 @@ export function withAuth<P extends WithAuthProps>(
 
 		return (
 			<WrappedComponent
+				// @ignore
 				{...(restProps as any)}
 				user={session.user}
 				session={session.session}

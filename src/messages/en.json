@@ -4,6 +4,12 @@
 		"documentation": "Documentation",
 		"settings": "Settings"
 	},
+	"validation": {
+		"required": "Field is required",
+		"min": "Value must be at least {number} characters long",
+		"max": "Value cannot exceed {number} characters",
+		"email": "Value must be a valid email"
+	},
 	"home": {
 		"title": "Hello world!"
 	}

@@ -4,6 +4,12 @@
 		"documentation": "Dokumentation",
 		"settings": "Indstillinger"
 	},
+	"validation": {
+		"required": "Felt er påkrævet",
+		"min": "Skal være minimum {number} karakterer",
+		"max": "Må maks være {number} karakterer",
+		"email": "Skal være en gyldig e-mail"
+	},
 	"home": {
 		"title": "Hej verden!"
 	}

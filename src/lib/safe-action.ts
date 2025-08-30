@@ -6,7 +6,8 @@ import z from 'zod'
 
 class ApplicationError extends Error {}
 
-export const baseActionClient = createSafeActionClient({
+const baseActionClient = createSafeActionClient({
+	defaultValidationErrorsShape: 'flattened',
 	defineMetadataSchema() {
 		return z.object({
 			actionName: z.string(),
@@ -30,3 +31,5 @@ export const baseActionClient = createSafeActionClient({
 		return DEFAULT_SERVER_ERROR_MESSAGE
 	},
 })
+
+export const publicAction = baseActionClient

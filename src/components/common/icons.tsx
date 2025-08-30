@@ -4,6 +4,7 @@ import {
 	Eclipse,
 	Home,
 	Languages,
+	Loader2,
 	LogOut,
 	MessageCircleQuestionMark,
 	Moon,
@@ -33,4 +34,5 @@ export const Icons = {
 	eclipse: (props: IconProps) => <Eclipse {...props} />,
 	warehouse: (props: IconProps) => <Warehouse {...props} />,
 	check: (props: IconProps) => <Check {...props} />,
+	loader: (props: IconProps) => <Loader2 {...props} />,
 }

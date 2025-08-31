@@ -22,12 +22,12 @@ import {
 } from '@/components/ui/sidebar'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { Locale } from '@/i18n/routing'
-import { authClient } from '@/lib/auth-client'
 import { cn } from '@/lib/utils'
 import { useLocale } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 import { Icons } from '../common/icons'
+import { useAuth } from '../providers/auth'
 
 export function User() {
 	const { setTheme, resolvedTheme } = useTheme()
@@ -43,10 +43,10 @@ export function User() {
 		}
 	}
 
-	const { data } = authClient.useSession()
+	const { user, signOut } = useAuth()
 
-	async function signOut() {
-		await authClient.signOut()
+	async function signOutHandler() {
+		await signOut()
 		toast('Goodbye, see you soon!')
 		router.refresh()
 	}
@@ -61,17 +61,17 @@ export function User() {
 							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'>
 							<Avatar className='h-8 w-8 rounded-md'>
 								<AvatarImage
-									src={data?.user.image as string}
-									alt={data?.user.name}
+									src={user?.image as string}
+									alt={user?.name}
 								/>
 								<AvatarFallback className='rounded-md'>CN</AvatarFallback>
 							</Avatar>
 							<div className='grid flex-1 text-left text-xs leading-tight'>
 								<span className='truncate font-bold leading-none'>
-									{data?.user.name}
+									{user?.name}
 								</span>
 								<span className='truncate text-muted-foreground leading-none'>
-									{data?.user.email}
+									{user?.email}
 								</span>
 							</div>
 							<Icons.upDownChevron className='ml-auto size-4' />
@@ -86,16 +86,16 @@ export function User() {
 							<div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
 								<Avatar className='h-8 w-8 rounded-md'>
 									<AvatarImage
-										src={data?.user.image as string}
-										alt={data?.user.name}
+										src={user?.image as string}
+										alt={user?.name}
 									/>
 									<AvatarFallback className='rounded-md'>CN</AvatarFallback>
 								</Avatar>
 								<div className='grid flex-1 text-left text-sm leading-tight'>
 									<span className='truncate font-medium'>
-										{data?.user.name}
+										{user?.name}
 									</span>
-									<span className='truncate text-xs'>{data?.user.email}</span>
+									<span className='truncate text-xs'>{user?.email}</span>
 								</div>
 							</div>
 						</DropdownMenuLabel>
@@ -170,7 +170,7 @@ export function User() {
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={signOut}>
+						<DropdownMenuItem onClick={signOutHandler}>
 							<Icons.logout />
 							Log out
 						</DropdownMenuItem>

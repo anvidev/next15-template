@@ -1,13 +1,13 @@
 import { redirect } from '@/i18n/navigation'
 import { Locale } from '@/i18n/routing'
-import { auth } from '@/lib/auth'
-import { Session, User } from 'better-auth'
-import { headers } from 'next/headers'
+import { authService } from '@/service/auth/service'
+import { Session, Tenant, User } from '@/store/auth/models'
 import React from 'react'
 
 export type WithAuthProps = {
-	user: User
 	session: Session
+	user: User
+	tenant: Tenant
 	locale: Locale
 }
 
@@ -21,8 +21,10 @@ export function withAuth<P extends WithAuthProps>(
 	return async function AuthenticatedComponent(props: ComponentProps) {
 		const { params, ...restProps } = props
 		const resolvedParams = await params
-		const session = await auth.api.getSession({ headers: await headers() })
+		const { session, user, tenant } = await authService.verify()
 		// TODO: get pathname and use for redirect after sign in
+		//
+		console.log("WithAuth::authService.verify", { session, user, tenant })
 
 		if (!session) {
 			redirect({
@@ -36,8 +38,9 @@ export function withAuth<P extends WithAuthProps>(
 			<WrappedComponent
 				// @ignore
 				{...(restProps as any)}
-				user={session.user}
-				session={session.session}
+				user={user}
+				session={session}
+				tenant={tenant}
 				locale={resolvedParams.locale}
 			/>
 		)

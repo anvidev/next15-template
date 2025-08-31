@@ -9,6 +9,7 @@ export function signInValidation(t: TFunc) {
 			.min(8, { error: t('min', { number: 8 }) }),
 	})
 }
+export type SignInInput = z.infer<ReturnType<typeof signInValidation>>
 
 export function signUpValidation(t: TFunc) {
 	return z.object({
@@ -20,3 +21,4 @@ export function signUpValidation(t: TFunc) {
 			.min(8, { error: t('min', { number: 8 }) }),
 	})
 }
+export type SignUpInput = z.infer<ReturnType<typeof signUpValidation>>

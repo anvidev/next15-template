@@ -1,9 +1,11 @@
 'use server'
 
-import { auth } from '@/lib/auth'
-import { publicAction } from '@/lib/safe-action'
+import { ApplicationError, publicAction } from '@/lib/safe-action'
+import { tryCatch } from '@/lib/try-catch'
 import { signInValidation, signUpValidation } from '@/schemas/auth'
 import { getServerSchema } from '@/schemas/utils'
+import { authService } from '@/service/auth/service'
+import { SessionPlatform } from '@/store/auth/models'
 import { flattenValidationErrors } from 'next-safe-action'
 
 async function getSignUpSchema() {
@@ -11,20 +13,32 @@ async function getSignUpSchema() {
 }
 
 export const signUpAction = publicAction
-	.metadata({ actionName: 'signInAction' })
+	.metadata({ actionName: 'signUpAction' })
 	.inputSchema(getSignUpSchema, {
 		handleValidationErrorsShape: async ve =>
 			flattenValidationErrors(ve).fieldErrors,
 	})
 	.action(async ({ parsedInput }) => {
-		const { organizationName, name, email, password } = parsedInput
-		await auth.api.signUpEmail({
-			body: {
-				name,
-				email,
-				password,
-			},
-		})
+		const newTenant = await tryCatch(authService.registerTenant(parsedInput))
+		if (!newTenant.success) {
+			throw new ApplicationError(newTenant.error.message)
+		}
+
+		// TOOD: send verification mail to admin user later
+
+		const newSession = await tryCatch(
+			authService.createSession(newTenant.data.user.id, SessionPlatform.Web),
+		)
+		if (!newSession.success) {
+			throw new ApplicationError(newSession.error.message)
+		}
+
+		const setCookie = await tryCatch(
+			authService.setSessionCookie(newSession.data.token),
+		)
+		if (!setCookie.success) {
+			throw new ApplicationError(setCookie.error.message)
+		}
 	})
 
 async function getSignInSchema() {
@@ -37,11 +51,23 @@ export const signInAction = publicAction
 		handleValidationErrorsShape: async ve =>
 			flattenValidationErrors(ve).fieldErrors,
 	})
-	.action(async ({ parsedInput: { email, password } }) => {
-		await auth.api.signInEmail({
-			body: {
-				email,
-				password,
-			},
-		})
+	.action(async ({ parsedInput }) => {
+		const authorized = await tryCatch(authService.authorizeCredentials(parsedInput))
+		if (!authorized.success) {
+			throw new ApplicationError(authorized.error.message)
+		}
+
+		const newSession = await tryCatch(
+			authService.createSession(authorized.data.id, SessionPlatform.Web),
+		)
+		if (!newSession.success) {
+			throw new ApplicationError(newSession.error.message)
+		}
+
+		const setCookie = await tryCatch(
+			authService.setSessionCookie(newSession.data.token),
+		)
+		if (!setCookie.success) {
+			throw new ApplicationError(setCookie.error.message)
+		}
 	})

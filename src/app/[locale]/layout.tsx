@@ -1,10 +1,12 @@
-import { ThemeProvider } from '@/components/providers/theme-provider'
+import { ThemeProvider } from '@/components/providers/theme'
 import { Toaster } from '@/components/ui/sonner'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { Geist, Geist_Mono } from 'next/font/google'
 import '../globals.css'
+import AuthProvider from '@/components/providers/auth'
+import { authService } from '@/service/auth/service'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -37,19 +39,26 @@ export default async function RootLayout({
 		console.log('locale not found', locale)
 	}
 
+	const data = await authService.verify()
+
 	return (
 		<html lang='en' suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<NextIntlClientProvider>
-					<ThemeProvider
-						attribute='class'
-						defaultTheme='system'
-						enableSystem
-						disableTransitionOnChange>
-						{children}
-						<Toaster position='top-center' />
-					</ThemeProvider>
+					<AuthProvider
+						session={data.session}
+						user={data.user}
+						tenant={data.tenant}>
+						<ThemeProvider
+							attribute='class'
+							defaultTheme='system'
+							enableSystem
+							disableTransitionOnChange>
+							{children}
+							<Toaster position='top-center' />
+						</ThemeProvider>
+					</AuthProvider>
 				</NextIntlClientProvider>
 			</body>
 		</html>

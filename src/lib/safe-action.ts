@@ -4,7 +4,7 @@ import {
 } from 'next-safe-action'
 import z from 'zod'
 
-class ApplicationError extends Error {}
+export class ApplicationError extends Error {}
 
 const baseActionClient = createSafeActionClient({
 	defaultValidationErrorsShape: 'flattened',

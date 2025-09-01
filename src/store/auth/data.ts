@@ -5,7 +5,7 @@ import {
 	tenantsTable,
 	usersTable,
 } from '@/lib/database/schema/auth'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import {
 	Account,
 	AccountProvider,
@@ -85,7 +85,7 @@ export const authStore = {
 		const rows = await tx
 			.select()
 			.from(usersTable)
-			.where(eq(usersTable.email, email))
+			.where(eq(sql`lower(${usersTable.email})`, email.toLowerCase()))
 		return rows.at(0)
 	},
 	createUser: async function (input: NewUser, tx: Tx = db): Promise<User> {

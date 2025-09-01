@@ -22,12 +22,12 @@ import {
 } from '@/components/ui/sidebar'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { Locale } from '@/i18n/routing'
-import { cn } from '@/lib/utils'
+import { cn, getInitials } from '@/lib/utils'
 import { useLocale } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
-import { Icons } from '../common/icons'
-import { useAuth } from '../providers/auth'
+import { Icons } from '@/components/common/icons'
+import { useAuth } from '@/components/providers/auth'
 
 export function User() {
 	const { setTheme, resolvedTheme } = useTheme()
@@ -46,9 +46,11 @@ export function User() {
 	const { user, signOut } = useAuth()
 
 	async function signOutHandler() {
-		await signOut()
-		toast('Goodbye, see you soon!')
-		router.refresh()
+		const didLogout = await signOut()
+		if (didLogout) {
+			toast('Goodbye, see you soon!')
+			router.refresh()
+		}
 	}
 
 	return (
@@ -64,7 +66,7 @@ export function User() {
 									src={user?.image as string}
 									alt={user?.name}
 								/>
-								<AvatarFallback className='rounded-md'>CN</AvatarFallback>
+								<AvatarFallback className='rounded-md uppercase'>{getInitials(user?.name ?? "")}</AvatarFallback>
 							</Avatar>
 							<div className='grid flex-1 text-left text-xs leading-tight'>
 								<span className='truncate font-bold leading-none'>

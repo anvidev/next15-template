@@ -9,13 +9,13 @@ export type AuthContextValue = {
 	session: Session
 	user: User
 	tenant: Tenant
-	signOut: () => Promise<void>
+	signOut: () => Promise<boolean>
 } | {
 	isAuthenticated: false
 	session: null
 	user: null
 	tenant: null
-	signOut: () => Promise<void>
+	signOut: () => Promise<boolean>
 }
 
 type Props = {
@@ -29,7 +29,7 @@ const AuthContext = createContext<AuthContextValue>({
 	session: null,
 	user: null,
 	tenant: null,
-	signOut: async () => { }
+	signOut: async () => { return false }
 })
 
 export default function AuthProvider({ children, ...value }: PropsWithChildren<Props>) {
@@ -38,8 +38,10 @@ export default function AuthProvider({ children, ...value }: PropsWithChildren<P
 			await fetch("/api/auth/sign-out", {
 				method: 'post',
 			})
+			return true
 		} catch (err) {
 			console.error(err)
+			return false
 		}
 	}
 

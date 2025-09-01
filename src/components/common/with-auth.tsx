@@ -20,16 +20,14 @@ export function withAuth<P extends WithAuthProps>(
 
 	return async function AuthenticatedComponent(props: ComponentProps) {
 		const { params, ...restProps } = props
-		const resolvedParams = await params
+		const { locale } = await params
 		const { session, user, tenant } = await authService.verify()
 		// TODO: get pathname and use for redirect after sign in
-		//
-		console.log("WithAuth::authService.verify", { session, user, tenant })
 
 		if (!session) {
 			redirect({
 				href: `/sign-in`,
-				locale: resolvedParams.locale,
+				locale: locale,
 			})
 			return
 		}
@@ -41,7 +39,7 @@ export function withAuth<P extends WithAuthProps>(
 				user={user}
 				session={session}
 				tenant={tenant}
-				locale={resolvedParams.locale}
+				locale={locale}
 			/>
 		)
 	}

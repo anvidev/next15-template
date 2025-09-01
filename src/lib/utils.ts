@@ -87,3 +87,14 @@ export function formatBytes(bytes: number, decimals = 2): string {
 		Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 	)
 }
+
+export function getInitials(name: string) {
+	var parts = name.split(' ')
+	var initials = ''
+	for (var i = 0; i < parts.length; i++) {
+		if (parts[i].length > 0 && parts[i] !== '') {
+			initials += parts[i][0]
+		}
+	}
+	return initials
+}

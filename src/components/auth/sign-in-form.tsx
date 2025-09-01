@@ -42,10 +42,8 @@ export function SignInForm() {
 
 	async function onSubmit(values: z.infer<typeof signInSchema>) {
 		const response = await signInAction({ ...values })
-		console.log('Response', response)
 		if (response && response.serverError) {
-			toast('Not good fam')
-			console.error(response.serverError)
+			toast(response.serverError)
 			return
 		}
 		toast('Welcome back!')

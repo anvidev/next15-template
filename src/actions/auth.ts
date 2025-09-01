@@ -1,7 +1,6 @@
 'use server'
 
-import { ApplicationError, publicAction } from '@/lib/safe-action'
-import { tryCatch } from '@/lib/try-catch'
+import { publicAction } from '@/lib/safe-action'
 import { signInValidation, signUpValidation } from '@/schemas/auth'
 import { getServerSchema } from '@/schemas/utils'
 import { authService } from '@/service/auth/service'
@@ -19,26 +18,15 @@ export const signUpAction = publicAction
 			flattenValidationErrors(ve).fieldErrors,
 	})
 	.action(async ({ parsedInput }) => {
-		const newTenant = await tryCatch(authService.registerTenant(parsedInput))
-		if (!newTenant.success) {
-			throw new ApplicationError(newTenant.error.message)
-		}
+		const newTenant = await authService.registerTenant(parsedInput)
 
 		// TOOD: send verification mail to admin user later
 
-		const newSession = await tryCatch(
-			authService.createSession(newTenant.data.user.id, SessionPlatform.Web),
+		const newSession = await authService.createSession(
+			newTenant.user.id,
+			SessionPlatform.Web,
 		)
-		if (!newSession.success) {
-			throw new ApplicationError(newSession.error.message)
-		}
-
-		const setCookie = await tryCatch(
-			authService.setSessionCookie(newSession.data.token),
-		)
-		if (!setCookie.success) {
-			throw new ApplicationError(setCookie.error.message)
-		}
+		const setCookie = await authService.setSessionCookie(newSession.token)
 	})
 
 async function getSignInSchema() {
@@ -52,22 +40,10 @@ export const signInAction = publicAction
 			flattenValidationErrors(ve).fieldErrors,
 	})
 	.action(async ({ parsedInput }) => {
-		const authorized = await tryCatch(authService.authorizeCredentials(parsedInput))
-		if (!authorized.success) {
-			throw new ApplicationError(authorized.error.message)
-		}
-
-		const newSession = await tryCatch(
-			authService.createSession(authorized.data.id, SessionPlatform.Web),
+		const authorized = await authService.authorizeCredentials(parsedInput)
+		const newSession = await authService.createSession(
+			authorized.id,
+			SessionPlatform.Web,
 		)
-		if (!newSession.success) {
-			throw new ApplicationError(newSession.error.message)
-		}
-
-		const setCookie = await tryCatch(
-			authService.setSessionCookie(newSession.data.token),
-		)
-		if (!setCookie.success) {
-			throw new ApplicationError(setCookie.error.message)
-		}
+		const setCookie = await authService.setSessionCookie(newSession.token)
 	})

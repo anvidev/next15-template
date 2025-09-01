@@ -92,7 +92,7 @@ export const authStore = {
 		const [user] = await tx.insert(usersTable).values(input).returning()
 		return user
 	},
-	getTenant: async function (
+	getTenantById: async function (
 		id: string,
 		tx: Tx = db,
 	): Promise<Tenant | undefined> {
@@ -100,6 +100,16 @@ export const authStore = {
 			.select()
 			.from(tenantsTable)
 			.where(eq(tenantsTable.id, id))
+		return rows.at(0)
+	},
+	getTenantBySlug: async function (
+		slug: string,
+		tx: Tx = db,
+	): Promise<Tenant | undefined> {
+		const rows = await tx
+			.select()
+			.from(tenantsTable)
+			.where(eq(tenantsTable.slug, slug))
 		return rows.at(0)
 	},
 	createTenant: async function (

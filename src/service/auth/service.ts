@@ -1,4 +1,5 @@
 import { db } from '@/lib/database/connection'
+import { ServiceError } from '@/lib/safe-action'
 import { generateRandomString, slugify } from '@/lib/utils'
 import { SignInInput, SignUpInput } from '@/schemas/auth'
 import { authStore } from '@/store/auth/data'
@@ -9,7 +10,6 @@ import {
 	Tenant,
 	User,
 } from '@/store/auth/models'
-import { StoreError } from '@/store/error'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { addDays, isWithinInterval, subDays } from 'date-fns'
@@ -55,7 +55,7 @@ export const authService = {
 			return { session: null, user: null, tenant: null }
 		}
 
-		const tenant = await authStore.getTenant(user.tenantId)
+		const tenant = await authStore.getTenantById(user.tenantId)
 		if (!tenant) {
 			return { session: null, user: null, tenant: null }
 		}
@@ -67,7 +67,7 @@ export const authService = {
 
 		const user = await authStore.getUserByEmail(email)
 		if (!user) {
-			throw new StoreError('User not found')
+			throw ServiceError.unauthorized('Invalid credentials')
 		}
 
 		const account = await authStore.getAccount(
@@ -75,16 +75,15 @@ export const authService = {
 			AccountProvider.Credential,
 		)
 		if (!account) {
-			throw new StoreError('Account not found')
+			throw ServiceError.unauthorized('Invalid credentials')
 		}
 		if (!account.passwordHash) {
-			throw new StoreError('Password hash is null')
+			throw ServiceError.unauthorized('Invalid credentials')
 		}
 
 		const samePassword = await bcrypt.compare(password, account.passwordHash)
-
 		if (!samePassword) {
-			throw new StoreError('Invalid credentials')
+			throw ServiceError.unauthorized('Invalid credentials')
 		}
 
 		return user
@@ -94,6 +93,11 @@ export const authService = {
 		platform: SessionPlatform,
 		duration = 7,
 	): Promise<Session> {
+		if (duration < 1 || duration > 30) {
+			throw ServiceError.validation(
+				'Session duration must be between 1 and 30 days',
+			)
+		}
 		const expiresAt = addDays(new Date(), duration)
 		const token = randomBytes(64).toString('hex')
 		return authStore.createSession({
@@ -104,8 +108,16 @@ export const authService = {
 			platform: platform,
 		})
 	},
-	setSessionCookie: async function (token: Session['token']): Promise<void> {
-		const expiry = addDays(new Date(), 7)
+	setSessionCookie: async function (
+		token: Session['token'],
+		duration = 7,
+	): Promise<void> {
+		if (duration < 1 || duration > 30) {
+			throw ServiceError.validation(
+				'Session duration must be between 1 and 30 days',
+			)
+		}
+		const expiry = addDays(new Date(), duration)
 		const cookieStore = await cookies()
 		cookieStore.set(SESSION_COOKIE, token, {
 			httpOnly: true,
@@ -119,6 +131,22 @@ export const authService = {
 		input: SignUpInput,
 	): Promise<{ tenant: Tenant; user: User }> {
 		const { organizationName, name, email, password } = input
+
+		const slug = slugify(organizationName)
+
+		const [existingUser, existingTenant] = await Promise.all([
+			authStore.getUserByEmail(email),
+			authStore.getTenantBySlug(slug),
+		])
+
+		if (existingUser) {
+			throw ServiceError.conflict('An account with this email already exists')
+		}
+		if (existingTenant) {
+			throw ServiceError.conflict(
+				'An organization with this name already exists',
+			)
+		}
 
 		const transaction = await db.transaction(async tx => {
 			const newTenant = await authStore.createTenant(

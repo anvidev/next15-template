@@ -47,7 +47,8 @@ export const authService = {
 			end: session.expiresAt,
 		})
 		if (closeToExpired) {
-			await authStore.extendSession(session.id)
+			const newExpiry = addDays(new Date(), 3)
+			await authStore.extendSession(session.id, newExpiry)
 		}
 
 		const user = await authStore.getUserById(session.userId)

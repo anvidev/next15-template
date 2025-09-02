@@ -47,9 +47,15 @@ export const authStore = {
 	},
 	extendSession: async function (
 		id: string,
-		amount: number = 3,
+		expiry: Date,
+		tx: Tx = db,
 	): Promise<Session> {
-		return {} as Session
+		const [session] = await tx
+			.update(sessionsTable)
+			.set({ expiresAt: expiry })
+			.where(eq(sessionsTable.id, id))
+			.returning()
+		return session
 	},
 	createAccount: async function (
 		input: NewAccount,

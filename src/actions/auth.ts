@@ -1,7 +1,12 @@
 'use server'
 
-import { publicAction } from '@/lib/safe-action'
-import { signInValidation, signUpValidation } from '@/schemas/auth'
+import { ApplicationError, publicAction } from '@/lib/safe-action'
+import { sleep } from '@/lib/utils'
+import {
+	signInValidation,
+	signUpValidation,
+	verifyValidation,
+} from '@/schemas/auth'
 import { getServerSchema } from '@/schemas/utils'
 import { authService } from '@/service/auth/service'
 import { SessionPlatform } from '@/store/auth/models'
@@ -46,4 +51,24 @@ export const signInAction = publicAction
 			SessionPlatform.Web,
 		)
 		const setCookie = await authService.setSessionCookie(newSession.token)
+	})
+
+async function getVerifySchema() {
+	return await getServerSchema(verifyValidation, 'validation')
+}
+
+export const verifyAction = publicAction
+	.metadata({ actionName: 'verifyAction' })
+	.inputSchema(getVerifySchema)
+	.action(async ({ parsedInput }) => {
+		const { token } = parsedInput
+		await sleep(3000)
+		const didVerify = await authService.confirmVerification(token)
+		if (!didVerify) {
+			throw new ApplicationError(
+				'Verification was not found',
+				'Actions: Not Found',
+				{ token },
+			)
+		}
 	})

@@ -22,3 +22,10 @@ export function signUpValidation(t: TFunc) {
 	})
 }
 export type SignUpInput = z.infer<ReturnType<typeof signUpValidation>>
+
+export function verifyValidation(t: TFunc) {
+	return z.object({
+		token: z.string({ error: t('required') }),
+	})
+}
+export type verifyInput = z.infer<ReturnType<typeof verifyValidation>>

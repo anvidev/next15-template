@@ -1,5 +1,7 @@
+import { EmailTemplate } from '@/components/emails/verify-email'
 import { db } from '@/lib/database/connection'
-import { ServiceError } from '@/lib/safe-action'
+import { FROM, resend } from '@/lib/resend'
+import { ApplicationError } from '@/lib/safe-action'
 import { generateRandomString, slugify } from '@/lib/utils'
 import { SignInInput, SignUpInput } from '@/schemas/auth'
 import { authStore } from '@/store/auth/data'
@@ -9,11 +11,14 @@ import {
 	SessionPlatform,
 	Tenant,
 	User,
+	Verification,
+	VerificationType,
 } from '@/store/auth/models'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { addDays, isWithinInterval, subDays } from 'date-fns'
 import { cookies } from 'next/headers'
+import { env } from 'process'
 
 const SESSION_COOKIE = 'session'
 
@@ -68,7 +73,11 @@ export const authService = {
 
 		const user = await authStore.getUserByEmail(email)
 		if (!user) {
-			throw ServiceError.unauthorized('Invalid credentials')
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{ message: 'User was not found', email },
+			)
 		}
 
 		const account = await authStore.getAccount(
@@ -76,15 +85,31 @@ export const authService = {
 			AccountProvider.Credential,
 		)
 		if (!account) {
-			throw ServiceError.unauthorized('Invalid credentials')
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{
+					message: 'Account was not found',
+					email,
+					provider: AccountProvider.Credential,
+				},
+			)
 		}
 		if (!account.passwordHash) {
-			throw ServiceError.unauthorized('Invalid credentials')
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{ message: 'Account has no password hash', email },
+			)
 		}
 
 		const samePassword = await bcrypt.compare(password, account.passwordHash)
 		if (!samePassword) {
-			throw ServiceError.unauthorized('Invalid credentials')
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{ message: 'Incorrect password', email },
+			)
 		}
 
 		return user
@@ -95,8 +120,10 @@ export const authService = {
 		duration = 7,
 	): Promise<Session> {
 		if (duration < 1 || duration > 30) {
-			throw ServiceError.validation(
+			throw new ApplicationError(
 				'Session duration must be between 1 and 30 days',
+				'Service: Validation Error',
+				{ duration },
 			)
 		}
 		const expiresAt = addDays(new Date(), duration)
@@ -114,8 +141,10 @@ export const authService = {
 		duration = 7,
 	): Promise<void> {
 		if (duration < 1 || duration > 30) {
-			throw ServiceError.validation(
+			throw new ApplicationError(
 				'Session duration must be between 1 and 30 days',
+				'Service: Validation Error',
+				{ duration },
 			)
 		}
 		const expiry = addDays(new Date(), duration)
@@ -141,11 +170,17 @@ export const authService = {
 		])
 
 		if (existingUser) {
-			throw ServiceError.conflict('An account with this email already exists')
+			throw new ApplicationError(
+				'An account with this email already exists',
+				'Service: Conflict',
+				{ name, email },
+			)
 		}
 		if (existingTenant) {
-			throw ServiceError.conflict(
+			throw new ApplicationError(
 				'An organization with this name already exists',
+				'Service: Conflict',
+				{ organizationName, name, email },
 			)
 		}
 
@@ -165,8 +200,8 @@ export const authService = {
 					name,
 					email,
 					tenantId: newTenant.id,
-					active: true,
-					emailVerified: true,
+					active: false,
+					emailVerified: false,
 				},
 				tx,
 			)
@@ -182,6 +217,38 @@ export const authService = {
 				},
 				tx,
 			)
+
+			const newVerification = await authStore.createVerification(
+				{
+					id: generateRandomString(32, 'verification_'),
+					userId: newAdminUser.id,
+					type: VerificationType.Email,
+					expiresAt: addDays(new Date(), 1),
+					token: generateRandomString(32),
+				},
+				tx,
+			)
+
+			const { error } = await resend.emails.send({
+				from: FROM,
+				to: [newAdminUser.email],
+				subject: 'Welcome to [PROJ_NAME] - [TRANSLATE LATER]',
+				react: EmailTemplate({
+					name: newAdminUser.name,
+					token: newVerification.token,
+					environment: env.NODE_ENV,
+				}),
+			})
+			if (error) {
+				try {
+					tx.rollback()
+				} catch (e) {}
+				throw new ApplicationError(
+					'Failed to send verification email',
+					'Service: Internal Server Error',
+					{ message: error.message, newAdminUser, newTenant },
+				)
+			}
 
 			return { tenant: newTenant, user: newAdminUser }
 		})
@@ -203,4 +270,18 @@ export const authService = {
 
 		return authStore.deleteSession(token)
 	},
+	getVerification: async function (token: string): Promise<Verification> {
+		const verification = await authStore.getVerification(token)
+		if (!verification) {
+			throw new ApplicationError(
+				'Verification token was not found or has already been used',
+				'Service: Not Found',
+				{ token },
+			)
+		}
+		return verification
+	},
+	confirmVerification: async function(token: string): Promise<boolean> {
+		return false
+	}
 }

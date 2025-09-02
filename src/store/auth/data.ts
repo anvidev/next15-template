@@ -4,8 +4,9 @@ import {
 	sessionsTable,
 	tenantsTable,
 	usersTable,
+	verificationsTable,
 } from '@/lib/database/schema/auth'
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, isNull, sql } from 'drizzle-orm'
 import {
 	Account,
 	AccountProvider,
@@ -13,9 +14,11 @@ import {
 	NewSession,
 	NewTenant,
 	NewUser,
+	NewVerification,
 	Session,
 	Tenant,
 	User,
+	Verification,
 } from './models'
 
 export const authStore = {
@@ -124,5 +127,30 @@ export const authStore = {
 	): Promise<Tenant> {
 		const [tenant] = await tx.insert(tenantsTable).values(input).returning()
 		return tenant
+	},
+	createVerification: async function (
+		input: NewVerification,
+		tx: Tx = db,
+	): Promise<Verification> {
+		const [verification] = await tx
+			.insert(verificationsTable)
+			.values(input)
+			.returning()
+		return verification
+	},
+	getVerification: async function (
+		token: string,
+		tx: Tx = db,
+	): Promise<Verification | undefined> {
+		const rows = await tx
+			.select()
+			.from(verificationsTable)
+			.where(
+				and(
+					eq(verificationsTable.token, token),
+					isNull(verificationsTable.verifiedAt),
+				),
+			)
+		return rows.at(0)
 	},
 }

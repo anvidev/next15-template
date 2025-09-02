@@ -5,8 +5,7 @@ export const env = createEnv({
 	server: {
 		TURSO_DATABASE_URL: z.string().min(1),
 		TURSO_AUTH_TOKEN: z.string().min(1),
-		BETTER_AUTH_SECRET: z.string().min(1),
-		BETTER_AUTH_URL: z.string().min(1),
+		RESEND_KEY: z.string().min(1),
 	},
 
 	/**

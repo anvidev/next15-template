@@ -10,6 +10,7 @@ import {
 	Moon,
 	Plus,
 	Settings2,
+	ShieldUser,
 	Sparkle,
 	Sun,
 	User,
@@ -35,4 +36,5 @@ export const Icons = {
 	warehouse: (props: IconProps) => <Warehouse {...props} />,
 	check: (props: IconProps) => <Check {...props} />,
 	loader: (props: IconProps) => <Loader2 {...props} />,
+	shieldUser: (props: IconProps) => <ShieldUser {...props} />,
 }

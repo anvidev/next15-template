@@ -1,8 +1,13 @@
 {
+	"errors": {
+		"unauthorized": "Adgang nægtet"
+	},
 	"sidebar": {
 		"home": "Hjem",
-		"documentation": "Dokumentation",
-		"settings": "Indstillinger"
+		"administration": "Administration",
+		"users": "Brugere",
+		"organization": "Organisation",
+		"billing": "Betaling"
 	},
 	"validation": {
 		"required": "Felt er påkrævet",
@@ -12,5 +17,8 @@
 	},
 	"home": {
 		"title": "Hej verden!"
+	},
+	"usersPage": {
+		"title": "Brugere"
 	}
 }

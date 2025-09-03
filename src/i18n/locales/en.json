@@ -1,8 +1,10 @@
 {
 	"sidebar": {
 		"home": "Home",
-		"documentation": "Documentation",
-		"settings": "Settings"
+		"administration": "Administration",
+		"users": "Users",
+		"organization": "Organization",
+		"billing": "Billing"
 	},
 	"validation": {
 		"required": "Field is required",
@@ -12,5 +14,8 @@
 	},
 	"home": {
 		"title": "Hello world!"
+	},
+	"usersPage": {
+		"title": "Users"
 	}
 }

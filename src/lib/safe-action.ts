@@ -1,3 +1,6 @@
+import { authService } from '@/service/auth/service'
+import { Role } from '@/store/auth/models'
+import { getTranslations } from 'next-intl/server'
 import {
 	createSafeActionClient,
 	DEFAULT_SERVER_ERROR_MESSAGE,
@@ -30,6 +33,56 @@ const baseActionClient = createSafeActionClient({
 })
 
 export const publicAction = baseActionClient
+	.use(async ({ next, ctx }) => {
+		const t = await getTranslations()
+
+		return next({ ctx: { ...ctx, t } })
+	})
+	.use(async ({ next, clientInput, metadata }) => {
+		const startTime = performance.now()
+		const response = await next()
+		const endTime = performance.now()
+
+		console.log('Result ->', response)
+		console.log('Client input ->', clientInput)
+		console.log('Metadata ->', metadata)
+		console.log('Action execution took', endTime - startTime, 'ms')
+
+		return response
+	})
+
+export const authedAction = publicAction.use(async ({ next, ctx }) => {
+	const { session, user, tenant } = await authService.verify()
+
+	if (!session) {
+		throw new ApplicationError(
+			ctx.t('errors.unauthorized'),
+			'Actions: Unauthorized',
+		)
+	}
+
+	if (!user.active) {
+		throw new ApplicationError(
+			ctx.t('errors.unauthorized'),
+			'Actions: Forbidden',
+			{ message: 'User is not active' },
+		)
+	}
+
+	return next({ ctx: { ...ctx, session, user, tenant } })
+})
+
+export const adminAction = authedAction.use(async ({ next, ctx }) => {
+	if (ctx.user.role != Role.Administrator) {
+		throw new ApplicationError(
+			ctx.t('errors.unauthorized'),
+			'Actions: Forbidden',
+			{ message: 'Not an admin user' },
+		)
+	}
+
+	return next({ ctx })
+})
 
 export class ApplicationError extends Error {
 	public readonly code: Code

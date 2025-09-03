@@ -18,7 +18,8 @@ export function Sidebar({
 	...props
 }: React.ComponentProps<typeof ShadcnSidebar>) {
 	const t = useTranslations('sidebar')
-	const data = {
+
+	const navItems = {
 		navMain: [
 			{
 				title: t('home'),
@@ -26,47 +27,20 @@ export function Sidebar({
 				icon: <Icons.home />,
 			},
 			{
-				title: t('documentation'),
-				url: '#',
-				icon: <Icons.sun />,
-				items: [
-					{
-						title: 'Introduction',
-						url: '#',
-					},
-					{
-						title: 'Get Started',
-						url: '#',
-					},
-					{
-						title: 'Tutorials',
-						url: '#',
-					},
-					{
-						title: 'Changelog',
-						url: '#',
-					},
-				],
-			},
-			{
-				title: t('settings'),
+				title: t('administration'),
 				url: '#',
 				icon: <Icons.settings />,
 				items: [
 					{
-						title: 'General',
+						title: t('users'),
+						url: '/administration/users',
+					},
+					{
+						title: t('organization'),
 						url: '#',
 					},
 					{
-						title: 'Team',
-						url: '#',
-					},
-					{
-						title: 'Billing',
-						url: '#',
-					},
-					{
-						title: 'Limits',
+						title: t('billing'),
 						url: '#',
 					},
 				],
@@ -80,7 +54,7 @@ export function Sidebar({
 				<Logo />
 			</SidebarHeader>
 			<SidebarContent>
-				<Navigation items={data.navMain} />
+				<Navigation items={navItems.navMain} />
 			</SidebarContent>
 			<SidebarFooter>
 				<User />

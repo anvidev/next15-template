@@ -1,7 +1,9 @@
 import { redirect } from '@/i18n/navigation'
 import { Locale } from '@/i18n/routing'
+import { TFunc } from '@/i18n/types'
 import { authService } from '@/service/auth/service'
 import { Session, Tenant, User } from '@/store/auth/models'
+import { getTranslations } from 'next-intl/server'
 import React from 'react'
 
 export type WithAuthProps = {
@@ -9,6 +11,7 @@ export type WithAuthProps = {
 	user: User
 	tenant: Tenant
 	locale: Locale
+	t: TFunc
 }
 
 export function withAuth<P extends WithAuthProps>(
@@ -20,6 +23,7 @@ export function withAuth<P extends WithAuthProps>(
 
 	return async function AuthenticatedComponent(props: ComponentProps) {
 		const { params, ...restProps } = props
+		const t = await getTranslations()
 		const { locale } = await params
 		const { session, user, tenant } = await authService.verify()
 		// TODO: get pathname and use for redirect after sign in
@@ -40,6 +44,7 @@ export function withAuth<P extends WithAuthProps>(
 				session={session}
 				tenant={tenant}
 				locale={locale}
+				t={t}
 			/>
 		)
 	}

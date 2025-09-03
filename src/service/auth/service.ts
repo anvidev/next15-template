@@ -19,11 +19,12 @@ import { randomBytes } from 'crypto'
 import { addDays, isWithinInterval, subDays } from 'date-fns'
 import { cookies } from 'next/headers'
 import { env } from 'process'
+import { cache } from 'react'
 
 const SESSION_COOKIE = 'session'
 
 export const authService = {
-	verify: async function (): Promise<
+	verify: cache(async function (): Promise<
 		| {
 				session: Session
 				user: User
@@ -67,7 +68,7 @@ export const authService = {
 		}
 
 		return { session, user, tenant }
-	},
+	}),
 	authorizeCredentials: async function (input: SignInInput): Promise<User> {
 		const { email, password } = input
 
@@ -281,7 +282,7 @@ export const authService = {
 		}
 		return verification
 	},
-	confirmVerification: async function(token: string): Promise<boolean> {
+	confirmVerification: async function (token: string): Promise<boolean> {
 		return false
-	}
+	},
 }

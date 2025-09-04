@@ -10,7 +10,7 @@ function Header({
 	return (
 		<header
 			className={cn(
-				'sticky top-0 flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12',
+				'sticky top-0 flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b',
 				className,
 			)}
 			{...props}>
@@ -59,7 +59,7 @@ function Actions({
 }: React.HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
-			className={cn('ml-auto flex items-center gap-2', className)}
+			className={cn('ml-auto flex items-center gap-2 -mr-1', className)}
 			{...props}>
 			{children}
 		</div>

@@ -68,8 +68,8 @@ export function User() {
 								/>
 								<AvatarFallback className='rounded-md uppercase'>{getInitials(user?.name ?? "")}</AvatarFallback>
 							</Avatar>
-							<div className='grid flex-1 text-left text-xs leading-tight'>
-								<span className='truncate font-bold leading-none'>
+							<div className='grid flex-1 gap-0.5 text-left text-xs'>
+								<span className='truncate font-medium leading-none'>
 									{user?.name}
 								</span>
 								<span className='truncate text-muted-foreground leading-none'>
@@ -91,13 +91,13 @@ export function User() {
 										src={user?.image as string}
 										alt={user?.name}
 									/>
-									<AvatarFallback className='rounded-md'>CN</AvatarFallback>
+									<AvatarFallback className='rounded-md'>{getInitials(user?.name!)}</AvatarFallback>
 								</Avatar>
-								<div className='grid flex-1 text-left text-sm leading-tight'>
-									<span className='truncate font-medium'>
+								<div className='grid gap-0.5 flex-1 text-left text-xs'>
+									<span className='truncate font-medium leading-none'>
 										{user?.name}
 									</span>
-									<span className='truncate text-xs'>{user?.email}</span>
+									<span className='truncate text-xs leading-none'>{user?.email}</span>
 								</div>
 							</div>
 						</DropdownMenuLabel>

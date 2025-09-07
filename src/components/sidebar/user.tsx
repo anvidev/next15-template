@@ -91,7 +91,7 @@ export function User() {
 										src={user?.image as string}
 										alt={user?.name}
 									/>
-									<AvatarFallback className='rounded-md'>{getInitials(user?.name!)}</AvatarFallback>
+									<AvatarFallback className='rounded-md'>{getInitials(user?.name ?? "")}</AvatarFallback>
 								</Avatar>
 								<div className='grid gap-0.5 flex-1 text-left text-xs'>
 									<span className='truncate font-medium leading-none'>

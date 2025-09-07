@@ -1,3 +1,4 @@
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ThemeProvider } from '@/components/providers/theme'
 import { Toaster } from '@/components/ui/sonner'
 import { routing } from '@/i18n/routing'
@@ -45,21 +46,23 @@ export default async function RootLayout({
 		<html lang='en' suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<NextIntlClientProvider>
-					<AuthProvider
-						session={data.session}
-						user={data.user}
-						tenant={data.tenant}>
-						<ThemeProvider
-							attribute='class'
-							defaultTheme='system'
-							enableSystem
-							disableTransitionOnChange>
-							{children}
-							<Toaster position='top-center' />
-						</ThemeProvider>
-					</AuthProvider>
-				</NextIntlClientProvider>
+				<NuqsAdapter>
+					<NextIntlClientProvider>
+						<AuthProvider
+							session={data.session}
+							user={data.user}
+							tenant={data.tenant}>
+							<ThemeProvider
+								attribute='class'
+								defaultTheme='system'
+								enableSystem
+								disableTransitionOnChange>
+								{children}
+								<Toaster position='top-center' />
+							</ThemeProvider>
+						</AuthProvider>
+					</NextIntlClientProvider>
+				</NuqsAdapter>
 			</body>
 		</html>
 	)

@@ -1,6 +1,8 @@
 import {
+	Calendar,
 	Check,
 	ChevronsUpDown,
+	Download,
 	Eclipse,
 	Home,
 	Languages,
@@ -9,12 +11,15 @@ import {
 	MessageCircleQuestionMark,
 	Moon,
 	Plus,
+	Pyramid,
+	Search,
 	Settings2,
 	ShieldUser,
 	Sparkle,
 	Sun,
 	User,
 	Warehouse,
+	X,
 } from 'lucide-react'
 import React from 'react'
 
@@ -37,4 +42,9 @@ export const Icons = {
 	check: (props: IconProps) => <Check {...props} />,
 	loader: (props: IconProps) => <Loader2 {...props} />,
 	shieldUser: (props: IconProps) => <ShieldUser {...props} />,
+	search: (props: IconProps) => <Search {...props} />,
+	download: (props: IconProps) => <Download {...props} />,
+	cross: (props: IconProps) => <X {...props} />,
+	calendar: (props: IconProps) => <Calendar {...props} />,
+	pyramid: (props: IconProps) => <Pyramid {...props} />,
 }

@@ -10,7 +10,7 @@ export function formatDate(
 	options?: Intl.DateTimeFormatOptions,
 ): string {
 	const dateObj = typeof date === 'string' ? new Date(date) : date
-	return new Intl.DateTimeFormat('en-US', {
+	return new Intl.DateTimeFormat('da-DK', {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',

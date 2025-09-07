@@ -235,7 +235,11 @@ export function Table({ promise }: Props) {
 			table={table}
 			actionBar={<UsersTableActionBar table={table} />}
 		>
-			<DataTableDynamicToolbar table={table} />
+			<DataTableDynamicToolbar
+				table={table}
+				showViewOptions
+				showExportTable
+			/>
 			{/* <DataTableToolbar table={table} /> */}
 		</DataTable>
 	)

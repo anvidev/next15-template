@@ -24,13 +24,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Icons } from "../common/icons";
+import { DataTableExportData } from "./data-table-export-data";
 
 interface DataTableDynamicToolbarProps<TData> extends React.ComponentProps<"div"> {
 	table: Table<TData>;
+	showViewOptions?: boolean
+	showExportTable?: boolean
 }
 
 export function DataTableDynamicToolbar<TData>({
 	table,
+	showViewOptions = false,
+	showExportTable = false,
 	children,
 	className,
 	...props
@@ -50,6 +55,7 @@ export function DataTableDynamicToolbar<TData>({
 		})
 	}
 
+	// TODO: implement removal of filters
 	function removeFilter(columnId: string) {
 		setVisibleFilters(prev => {
 			prev.delete(columnId)
@@ -82,7 +88,6 @@ export function DataTableDynamicToolbar<TData>({
 				))}
 				{visibleFilters.size < columns.length && (
 					<AddFilterButton
-						table={table}
 						onAdd={addFilter}
 						columns={unfilteredColumns} />
 				)}
@@ -101,7 +106,12 @@ export function DataTableDynamicToolbar<TData>({
 			</div>
 			<div className="flex items-center gap-2">
 				{children}
-				<DataTableViewOptions table={table} />
+				{showExportTable && (
+					<DataTableExportData table={table} />
+				)}
+				{showViewOptions && (
+					<DataTableViewOptions table={table} />
+				)}
 			</div>
 		</div>
 	);
@@ -243,12 +253,11 @@ function GlobalFilter<TData>({ table }: DataTableToolbarGlobalFilterProps<TData>
 }
 
 interface DataTableDynamicToolbarAddFilterProps<TData> {
-	table: Table<TData>
 	onAdd: (columnId: string) => void
 	columns: Column<TData, unknown>[]
 }
 
-function AddFilterButton<TData>({ table, onAdd, columns }: DataTableDynamicToolbarAddFilterProps<TData>) {
+function AddFilterButton<TData>({ onAdd, columns }: DataTableDynamicToolbarAddFilterProps<TData>) {
 	const [open, setOpen] = React.useState(false)
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

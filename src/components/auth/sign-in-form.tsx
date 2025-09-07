@@ -23,14 +23,26 @@ import { Link, useRouter } from '@/i18n/navigation'
 import { signInValidation } from '@/schemas/auth'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
+import { useAction } from 'next-safe-action/hooks'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
+import { Loader } from '../common/loader'
 
 export function SignInForm() {
 	const router = useRouter()
 	const t = useTranslations('validation')
 	const signInSchema = signInValidation(t)
+	const { execute, isExecuting } = useAction(signInAction, {
+		onError({ error }) {
+			toast(error.serverError)
+		},
+		onSuccess() {
+			toast('Welcome back!')
+			router.replace('/')
+			router.refresh()
+		},
+	})
 
 	const form = useForm<z.infer<typeof signInSchema>>({
 		resolver: zodResolver(signInSchema),
@@ -40,16 +52,6 @@ export function SignInForm() {
 		},
 	})
 
-	async function onSubmit(values: z.infer<typeof signInSchema>) {
-		const response = await signInAction({ ...values })
-		if (response && response.serverError) {
-			toast(response.serverError)
-			return
-		}
-		toast('Welcome back!')
-		router.replace('/')
-		router.refresh()
-	}
 	return (
 		<Card className='w-full max-w-sm'>
 			<CardHeader>
@@ -62,7 +64,7 @@ export function SignInForm() {
 				<Form {...form}>
 					<form
 						id='sign-in-form'
-						onSubmit={form.handleSubmit(onSubmit)}
+						onSubmit={form.handleSubmit(execute)}
 						className='space-y-4'>
 						<FormField
 							control={form.control}
@@ -95,6 +97,7 @@ export function SignInForm() {
 			</CardContent>
 			<CardFooter className='flex-col gap-2'>
 				<Button form='sign-in-form' type='submit' className='w-full'>
+					{isExecuting && <Loader />}
 					Login
 				</Button>
 				<div className='mt-4 text-center text-sm'>

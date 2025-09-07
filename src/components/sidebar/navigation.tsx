@@ -14,6 +14,7 @@ import {
 	SidebarMenuSub,
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
+	useSidebar,
 } from '@/components/ui/sidebar'
 import { Link } from '@/i18n/navigation'
 import { ChevronRight } from 'lucide-react'
@@ -32,6 +33,15 @@ export function Navigation({
 		}[]
 	}[]
 }) {
+	const { state, setOpen } = useSidebar()
+
+	function openIfCollapsed() {
+		if (state !== 'collapsed') {
+			return
+		}
+		setOpen(true)
+	}
+
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>Navigation</SidebarGroupLabel>
@@ -41,7 +51,7 @@ export function Navigation({
 						<Collapsible key={item.title} asChild className='group/collapsible'>
 							<SidebarMenuItem>
 								<CollapsibleTrigger asChild>
-									<SidebarMenuButton tooltip={item.title}>
+									<SidebarMenuButton tooltip={item.title} onClick={openIfCollapsed}>
 										{item.icon && item.icon}
 										<span>{item.title}</span>
 										<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />

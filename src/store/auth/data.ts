@@ -101,6 +101,16 @@ export const authStore = {
 		const [user] = await tx.insert(usersTable).values(input).returning()
 		return user
 	},
+	listUsers: async function (
+		tenantId: Tenant['id'],
+		tx: Tx = db,
+	): Promise<User[]> {
+		return await tx
+			.select()
+			.from(usersTable)
+			.where(eq(usersTable.tenantId, tenantId))
+			.orderBy(usersTable.createdAt)
+	},
 	getTenantById: async function (
 		id: string,
 		tx: Tx = db,
@@ -135,6 +145,20 @@ export const authStore = {
 		const [verification] = await tx
 			.insert(verificationsTable)
 			.values(input)
+			.returning()
+		return verification
+	},
+	updateVerification: async function (
+		token: Verification['token'],
+		input: Partial<Pick<Verification, 'expiresAt' | 'verifiedAt'>>,
+		tx: Tx = db,
+	): Promise<Verification> {
+		const [verification] = await tx
+			.update(verificationsTable)
+			.set({
+				...input,
+			})
+			.where(eq(verificationsTable.token, token))
 			.returning()
 		return verification
 	},

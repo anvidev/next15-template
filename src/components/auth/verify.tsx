@@ -2,26 +2,34 @@
 
 import { verifyAction } from "@/actions/auth";
 import { Card, CardContent } from "@/components/ui/card"
-import { Verification } from "@/store/auth/models"
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/common/loader";
 import { useRouter } from "@/i18n/navigation";
-import { useTransition } from "react";
 import { toast } from "sonner";
+import { authService } from "@/service/auth/service";
+import * as React from 'react'
+import { useAction } from "next-safe-action/hooks";
+import { SafeResult } from "@/lib/try-catch";
 
-export function Verify({ verification }: { verification: Verification }) {
+interface Props {
+	promise: Promise<SafeResult<Awaited<ReturnType<typeof authService.getVerification>>>>
+}
+
+export function Verify({ promise }: Props) {
+	const { success, data: verification } = React.use(promise)
 	const router = useRouter()
-	const [pending, startTransition] = useTransition()
-
-	async function verify() {
-		startTransition(async () => {
-			const response = await verifyAction({ token: verification.token })
-			if (response.serverError) {
-				toast(response.serverError)
-				return
-			}
+	const { execute, isExecuting } = useAction(verifyAction, {
+		onError({ error }) {
+			toast(error.serverError)
+		},
+		onSuccess() {
+			toast("Email has been verified")
 			router.replace("/")
-		})
+		}
+	})
+
+	if (!success) {
+		return <VerifyNotFound />
 	}
 
 	return (
@@ -30,8 +38,8 @@ export function Verify({ verification }: { verification: Verification }) {
 				<p className="text-center text-sm text-muted-foreground">
 					To protect your account and confirm your identity, we need to verify your email address. Please click the button below to complete the process and activate your account securely.
 				</p>
-				<Button className="w-full" onClick={verify}>
-					{pending && <Loader />}
+				<Button className="w-full" onClick={() => execute({ token: verification.token })}>
+					{isExecuting && <Loader />}
 					Confirm verification
 				</Button>
 			</CardContent>

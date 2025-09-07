@@ -282,7 +282,10 @@ export const authService = {
 		}
 		return verification
 	},
-	confirmVerification: async function (token: string): Promise<boolean> {
-		return false
+	confirmVerification: async function (token: string): Promise<Verification> {
+		return authStore.updateVerification(token, { verifiedAt: new Date() })
+	},
+	listUsers: async function (tenantId: Tenant['id']): Promise<User[]> {
+		return await authStore.listUsers(tenantId)
 	},
 }

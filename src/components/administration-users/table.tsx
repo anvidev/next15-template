@@ -86,7 +86,7 @@ export function Table({ promise }: Props) {
 				label: "Name",
 				placeholder: "Search names...",
 				variant: "text",
-				icon: Icons.search,
+				icon: Icons.type,
 			},
 			enableColumnFilter: true,
 		}),
@@ -99,7 +99,7 @@ export function Table({ promise }: Props) {
 				label: "Email",
 				placeholder: "Search email...",
 				variant: "text",
-				icon: Icons.search,
+				icon: Icons.type,
 			},
 			enableColumnFilter: true,
 		}),
@@ -124,7 +124,7 @@ export function Table({ promise }: Props) {
 					{ label: 'Verified', value: String(true), icon: Icons.check },
 					{ label: 'Not verified', value: String(false), icon: Icons.cross },
 				],
-				icon: CircleDashed,
+				icon: Icons.list,
 			},
 			enableColumnFilter: true,
 		}),
@@ -136,13 +136,12 @@ export function Table({ promise }: Props) {
 			cell: ({ getValue }) => getValue().charAt(0).toUpperCase() + getValue().slice(1),
 			meta: {
 				label: 'Role',
-				icon: Icons.shieldUser,
+				icon: Icons.list,
 				variant: 'multiSelect',
 				placeholder: 'Choose roles',
 				options: roles.map(r => ({
 					label: r.charAt(0).toUpperCase() + r.slice(1),
 					value: r,
-					icon: Icons.sparkle
 				}))
 			},
 			enableColumnFilter: true,

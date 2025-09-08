@@ -6,6 +6,7 @@ import {
 	Eclipse,
 	Home,
 	Languages,
+	List,
 	Loader2,
 	LogOut,
 	MessageCircleQuestionMark,
@@ -17,6 +18,8 @@ import {
 	ShieldUser,
 	Sparkle,
 	Sun,
+	Text,
+	Type,
 	User,
 	Warehouse,
 	X,
@@ -47,4 +50,6 @@ export const Icons = {
 	cross: (props: IconProps) => <X {...props} />,
 	calendar: (props: IconProps) => <Calendar {...props} />,
 	pyramid: (props: IconProps) => <Pyramid {...props} />,
+	type: (props: IconProps) => <Type {...props} />,
+	list: (props: IconProps) => <List {...props} />,
 }

@@ -3,7 +3,6 @@ import { db } from '@/lib/database/connection'
 import { FROM, resend } from '@/lib/resend'
 import { ApplicationError } from '@/lib/safe-action'
 import { generateRandomString, slugify } from '@/lib/utils'
-import { SignInInput, SignUpInput } from '@/schemas/auth'
 import { authStore } from '@/store/auth/data'
 import {
 	AccountProvider,
@@ -14,6 +13,7 @@ import {
 	Verification,
 	VerificationType,
 } from '@/store/auth/models'
+import { SignInInput, SignUpInput } from '@/store/auth/validations'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { addDays, isWithinInterval, subDays } from 'date-fns'

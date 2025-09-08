@@ -2,14 +2,14 @@
 
 import { publicAction } from '@/lib/safe-action'
 import { sleep } from '@/lib/utils'
+import { getServerSchema } from '@/lib/validations'
+import { authService } from '@/service/auth/service'
+import { SessionPlatform } from '@/store/auth/models'
 import {
 	signInValidation,
 	signUpValidation,
 	verifyValidation,
-} from '@/schemas/auth'
-import { getServerSchema } from '@/schemas/utils'
-import { authService } from '@/service/auth/service'
-import { SessionPlatform } from '@/store/auth/models'
+} from '@/store/auth/validations'
 import { flattenValidationErrors } from 'next-safe-action'
 
 async function getSignUpSchema() {
@@ -23,15 +23,7 @@ export const signUpAction = publicAction
 			flattenValidationErrors(ve).fieldErrors,
 	})
 	.action(async ({ parsedInput }) => {
-		const newTenant = await authService.registerTenant(parsedInput)
-
-		// TOOD: send verification mail to admin user later
-
-		const newSession = await authService.createSession(
-			newTenant.user.id,
-			SessionPlatform.Web,
-		)
-		await authService.setSessionCookie(newSession.token)
+		await authService.registerTenant(parsedInput)
 	})
 
 async function getSignInSchema() {

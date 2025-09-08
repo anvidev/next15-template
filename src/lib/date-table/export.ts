@@ -11,7 +11,7 @@ export function exportTableToCSV<TData>(
 	const { filename = 'table', excludeColumns = [], onlySelected = false } = opts
 
 	const headers = table
-		.getAllLeafColumns()
+		.getVisibleLeafColumns()
 		.map(column => column.id)
 		.filter(
 			id => !excludeColumns.includes(id as keyof TData | 'actions' | 'select'),

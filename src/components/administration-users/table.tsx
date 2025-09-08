@@ -27,10 +27,11 @@ import {
 import { Button } from "../ui/button"
 import { CircleDashed, Ellipsis } from "lucide-react"
 import { toast } from "sonner"
-import { formatDate, sleep } from "@/lib/utils"
+import { formatDate, getInitials, sleep } from "@/lib/utils"
 import { DataTableRowAction } from "@/lib/date-table/types"
 import { Badge } from "../ui/badge"
 import { DataTableDynamicToolbar } from "../data-table/data-table-dynamic-toolbar"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 interface Props {
 	promise: Promise<Awaited<ReturnType<typeof authService.listUsers>>>
@@ -69,6 +70,18 @@ export function Table({ promise }: Props) {
 			header: ({ column }) => (
 				<DataTableColumnHeader column={column} title="Name" />
 			),
+			cell: ({ row }) => (
+				<div className="flex items-center gap-2">
+					<Avatar className='size-7 rounded-md'>
+						<AvatarImage
+							src={row.original.image || undefined}
+							alt={row.original.name}
+						/>
+						<AvatarFallback className='rounded-md text-xs font-medium uppercase'>{getInitials(row.original.name)}</AvatarFallback>
+					</Avatar>
+					<p>{row.original.name}</p>
+				</div>
+			),
 			meta: {
 				label: "Name",
 				placeholder: "Search names...",
@@ -99,7 +112,7 @@ export function Table({ promise }: Props) {
 				const emailVerifed = cell.row.original.emailVerified
 				return (
 					<Badge variant="outline" className="py-1 [&>svg]:size-3.5">
-						{emailVerifed ? <Icons.check className="text-green-600" /> : <Icons.cross className="text-destructive" />}
+						{emailVerifed ? <Icons.check className="text-success" /> : <Icons.cross className="text-destructive" />}
 						<span className="capitalize">{emailVerifed ? 'Verified' : 'Not verified'}</span>
 					</Badge>
 				);
@@ -227,7 +240,12 @@ export function Table({ promise }: Props) {
 		getRowId: orignial => orignial.id,
 		clearOnDefault: true,
 		shallow: false,
-		enableGlobalFilter: true
+		enableGlobalFilter: true,
+		initialState: {
+			sorting: [
+				{ id: 'createdAt', desc: true },
+			]
+		}
 	})
 
 	return (

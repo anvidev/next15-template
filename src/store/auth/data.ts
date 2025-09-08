@@ -6,7 +6,19 @@ import {
 	usersTable,
 	verificationsTable,
 } from '@/lib/database/schema/auth'
-import { and, eq, isNull, sql } from 'drizzle-orm'
+import {
+	and,
+	asc,
+	between,
+	desc,
+	eq,
+	inArray,
+	isNull,
+	like,
+	or,
+	SQL,
+	sql,
+} from 'drizzle-orm'
 import {
 	Account,
 	AccountProvider,
@@ -20,6 +32,7 @@ import {
 	User,
 	Verification,
 } from './models'
+import { ListUsersFilters } from './validations'
 
 export const authStore = {
 	createSession: async function (
@@ -103,13 +116,65 @@ export const authStore = {
 	},
 	listUsers: async function (
 		tenantId: Tenant['id'],
+		filters?: ListUsersFilters,
 		tx: Tx = db,
 	): Promise<User[]> {
-		return await tx
+		const conditions: (SQL | undefined)[] = [eq(usersTable.tenantId, tenantId)]
+
+		if (filters) {
+			if (filters.q.trim() !== '') {
+				const searchTerm = `%${filters.q.toLowerCase().trim()}%`
+				conditions.push(
+					or(
+						like(sql`lower(${usersTable.name})`, searchTerm),
+						like(sql`lower(${usersTable.email})`, searchTerm),
+					),
+				)
+			}
+			if (filters.name.trim() !== '') {
+				const searchTerm = `%${filters.name.toLowerCase().trim()}%`
+				conditions.push(like(sql`lower(${usersTable.name})`, searchTerm))
+			}
+			if (filters.email.trim() !== '') {
+				const searchTerm = `%${filters.email.toLowerCase().trim()}%`
+				conditions.push(like(sql`lower(${usersTable.email})`, searchTerm))
+			}
+			if (filters.role?.length) {
+				conditions.push(inArray(usersTable.role, filters.role))
+			}
+			if (typeof filters.emailVerified === 'boolean') {
+				conditions.push(eq(usersTable.emailVerified, filters.emailVerified))
+			}
+			if (filters.createdAt?.length === 2) {
+				const [startDate, endDate] = filters.createdAt
+				const endOfDay = new Date(endDate)
+				endOfDay.setHours(23, 59, 59, 999)
+				conditions.push(between(usersTable.createdAt, startDate, endOfDay))
+			}
+		}
+
+		const stmt = tx
 			.select()
 			.from(usersTable)
-			.where(eq(usersTable.tenantId, tenantId))
-			.orderBy(usersTable.createdAt)
+			.where(and(...conditions))
+
+		if (filters?.perPage) {
+			stmt.limit(filters.perPage)
+
+			if (filters.page && filters.page > 0) {
+				stmt.offset((filters.page - 1) * filters.perPage)
+			}
+		}
+		if (filters?.sort) {
+			const orders: SQL[] = []
+			filters.sort.forEach(s => {
+				const orderBy = s.desc ? desc : asc
+				orders.push(orderBy(usersTable[s.id]))
+			})
+			stmt.orderBy(...orders)
+		}
+
+		return await stmt
 	},
 	getTenantById: async function (
 		id: string,

@@ -13,7 +13,11 @@ import {
 	Verification,
 	VerificationType,
 } from '@/store/auth/models'
-import { SignInInput, SignUpInput } from '@/store/auth/validations'
+import {
+	ListUsersFilters,
+	SignInInput,
+	SignUpInput,
+} from '@/store/auth/validations'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { addDays, isWithinInterval, subDays } from 'date-fns'
@@ -285,7 +289,10 @@ export const authService = {
 	confirmVerification: async function (token: string): Promise<Verification> {
 		return authStore.updateVerification(token, { verifiedAt: new Date() })
 	},
-	listUsers: async function (tenantId: Tenant['id']): Promise<User[]> {
-		return await authStore.listUsers(tenantId)
+	listUsers: async function (
+		tenantId: Tenant['id'],
+		filters?: ListUsersFilters,
+	): Promise<User[]> {
+		return await authStore.listUsers(tenantId, filters)
 	},
 }

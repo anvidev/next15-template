@@ -13,40 +13,52 @@ import {
 import { useTranslations } from 'next-intl'
 import * as React from 'react'
 import { Icons } from '../common/icons'
+import { Role } from '@/store/auth/models'
+
+export type NavigationItem = {
+	title: string
+	url: string
+	icon: React.JSX.Element
+	roles?: Role[]
+	items?: {
+		title: string
+		url: string
+		roles?: Role[]
+	}[]
+}
 
 export function Sidebar({
 	...props
 }: React.ComponentProps<typeof ShadcnSidebar>) {
 	const t = useTranslations('sidebar')
 
-	const navItems = {
-		navMain: [
-			{
-				title: t('home'),
-				url: '#',
-				icon: <Icons.home />,
-			},
-			{
-				title: t('administration'),
-				url: '#',
-				icon: <Icons.settings />,
-				items: [
-					{
-						title: t('users'),
-						url: '/administration/users',
-					},
-					{
-						title: t('organization'),
-						url: '#',
-					},
-					{
-						title: t('billing'),
-						url: '#',
-					},
-				],
-			},
-		],
-	}
+	const navItems: NavigationItem[] = [
+		{
+			title: t('home'),
+			url: '#',
+			icon: <Icons.home />,
+		},
+		{
+			title: t('administration'),
+			url: '#',
+			icon: <Icons.settings />,
+			roles: [Role.Administrator],
+			items: [
+				{
+					title: t('users'),
+					url: '/administration/users',
+				},
+				{
+					title: t('organization'),
+					url: '#',
+				},
+				{
+					title: t('billing'),
+					url: '#',
+				},
+			],
+		},
+	]
 
 	return (
 		<ShadcnSidebar collapsible='icon' {...props}>
@@ -54,7 +66,7 @@ export function Sidebar({
 				<Logo />
 			</SidebarHeader>
 			<SidebarContent>
-				<Navigation items={navItems.navMain} />
+				<Navigation items={navItems} />
 			</SidebarContent>
 			<SidebarFooter>
 				<User />

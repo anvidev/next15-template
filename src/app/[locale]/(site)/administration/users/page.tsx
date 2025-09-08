@@ -15,7 +15,7 @@ interface Props extends WithAuthProps {
 async function UsersPage({ t, tenant, searchParams }: Props) {
 	const filters = await loadUsersSearchParams(searchParams);
 	console.log("filters", filters)
-	const users = authService.listUsers(tenant.id)
+	const users = authService.listUsers(tenant.id, filters)
 	return (
 		<>
 			<Page.Header>

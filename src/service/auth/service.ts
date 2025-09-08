@@ -291,8 +291,8 @@ export const authService = {
 	},
 	listUsers: async function (
 		tenantId: Tenant['id'],
-		filters?: ListUsersFilters,
-	): Promise<User[]> {
+		filters: ListUsersFilters,
+	): Promise<{ users: User[]; pageCount: number }> {
 		return await authStore.listUsers(tenantId, filters)
 	},
 }

@@ -38,7 +38,7 @@ interface Props {
 }
 
 export function Table({ promise }: Props) {
-	const users = React.use(promise)
+	const { users, pageCount } = React.use(promise)
 
 	const columns = createColumns<User>((c, _t) => [
 		c.display({
@@ -236,7 +236,7 @@ export function Table({ promise }: Props) {
 	const { table } = useDataTable({
 		data: users,
 		columns,
-		pageCount: 1,
+		pageCount,
 		getRowId: orignial => orignial.id,
 		clearOnDefault: true,
 		shallow: false,
@@ -258,7 +258,6 @@ export function Table({ promise }: Props) {
 				showViewOptions
 				showExportTable
 			/>
-			{/* <DataTableToolbar table={table} /> */}
 		</DataTable>
 	)
 }

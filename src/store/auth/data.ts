@@ -10,6 +10,7 @@ import {
 	and,
 	asc,
 	between,
+	count,
 	desc,
 	eq,
 	inArray,
@@ -116,53 +117,51 @@ export const authStore = {
 	},
 	listUsers: async function (
 		tenantId: Tenant['id'],
-		filters?: ListUsersFilters,
+		filters: ListUsersFilters,
 		tx: Tx = db,
-	): Promise<User[]> {
+	): Promise<{ users: User[]; pageCount: number }> {
 		const conditions: (SQL | undefined)[] = [eq(usersTable.tenantId, tenantId)]
 
-		if (filters) {
-			if (filters.q.trim() !== '') {
-				const searchTerm = `%${filters.q.toLowerCase().trim()}%`
-				conditions.push(
-					or(
-						like(sql`lower(${usersTable.name})`, searchTerm),
-						like(sql`lower(${usersTable.email})`, searchTerm),
-					),
-				)
-			}
-			if (filters.name.trim() !== '') {
-				const searchTerm = `%${filters.name.toLowerCase().trim()}%`
-				conditions.push(like(sql`lower(${usersTable.name})`, searchTerm))
-			}
-			if (filters.email.trim() !== '') {
-				const searchTerm = `%${filters.email.toLowerCase().trim()}%`
-				conditions.push(like(sql`lower(${usersTable.email})`, searchTerm))
-			}
-			if (filters.role?.length) {
-				conditions.push(inArray(usersTable.role, filters.role))
-			}
-			if (typeof filters.emailVerified === 'boolean') {
-				conditions.push(eq(usersTable.emailVerified, filters.emailVerified))
-			}
-			if (filters.createdAt?.length === 2) {
-				const [startDate, endDate] = filters.createdAt
-				const endOfDay = new Date(endDate)
-				endOfDay.setHours(23, 59, 59, 999)
-				conditions.push(between(usersTable.createdAt, startDate, endOfDay))
-			}
+		if (filters.q.trim() !== '') {
+			const searchTerm = `%${filters.q.toLowerCase().trim()}%`
+			conditions.push(
+				or(
+					like(sql`lower(${usersTable.name})`, searchTerm),
+					like(sql`lower(${usersTable.email})`, searchTerm),
+				),
+			)
+		}
+		if (filters.name.trim() !== '') {
+			const searchTerm = `%${filters.name.toLowerCase().trim()}%`
+			conditions.push(like(sql`lower(${usersTable.name})`, searchTerm))
+		}
+		if (filters.email.trim() !== '') {
+			const searchTerm = `%${filters.email.toLowerCase().trim()}%`
+			conditions.push(like(sql`lower(${usersTable.email})`, searchTerm))
+		}
+		if (filters.role?.length) {
+			conditions.push(inArray(usersTable.role, filters.role))
+		}
+		if (typeof filters.emailVerified === 'boolean') {
+			conditions.push(eq(usersTable.emailVerified, filters.emailVerified))
+		}
+		if (filters.createdAt?.length === 2) {
+			const [startDate, endDate] = filters.createdAt
+			const endOfDay = new Date(endDate)
+			endOfDay.setHours(23, 59, 59, 999)
+			conditions.push(between(usersTable.createdAt, startDate, endOfDay))
 		}
 
-		const stmt = tx
+		const rows = tx
 			.select()
 			.from(usersTable)
 			.where(and(...conditions))
 
 		if (filters?.perPage) {
-			stmt.limit(filters.perPage)
+			rows.limit(filters.perPage)
 
 			if (filters.page && filters.page > 0) {
-				stmt.offset((filters.page - 1) * filters.perPage)
+				rows.offset((filters.page - 1) * filters.perPage)
 			}
 		}
 		if (filters?.sort) {
@@ -171,10 +170,20 @@ export const authStore = {
 				const orderBy = s.desc ? desc : asc
 				orders.push(orderBy(usersTable[s.id]))
 			})
-			stmt.orderBy(...orders)
+			rows.orderBy(...orders)
 		}
 
-		return await stmt
+		const totalRows = tx
+			.select({ count: count() })
+			.from(usersTable)
+			.where(and(...conditions))
+			.then(result => result.at(0)?.count ?? 0)
+
+		const [users, total] = await Promise.all([rows, totalRows])
+
+		const pageCount = Math.ceil(total / filters.perPage)
+
+		return { users, pageCount }
 	},
 	getTenantById: async function (
 		id: string,

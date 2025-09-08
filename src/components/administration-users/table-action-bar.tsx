@@ -8,7 +8,7 @@ import {
 	DataTableActionBarSelection,
 } from "@/components/data-table/data-table-action-bar";
 import { Separator } from "@/components/ui/separator";
-import { exportTableToCSV } from "@/lib/export";
+import { exportTableToCSV } from "@/lib/date-table/export";
 import { User } from "@/store/auth/models";
 import { Icons } from "../common/icons";
 

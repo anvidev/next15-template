@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { exportTableToCSV } from "@/lib/date-table/export";
 import { User } from "@/store/auth/models";
 import { Icons } from "../common/icons";
+import { emitCustomEvent } from "react-custom-events";
 
 const actions = [
 	"update-status",
@@ -60,6 +61,13 @@ export function UsersTableActionBar({ table }: Props) {
 					onClick={onTaskExport}
 				>
 					<Icons.download />
+				</DataTableActionBarAction>
+				<DataTableActionBarAction
+					size="icon"
+					tooltip="Export tasks"
+					onClick={() => emitCustomEvent('delete-users-dialog', rows)}
+				>
+					<Icons.trash />
 				</DataTableActionBarAction>
 			</div>
 		</DataTableActionBar>

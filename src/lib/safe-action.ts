@@ -1,6 +1,6 @@
 import { authService } from '@/service/auth/service'
 import { Role } from '@/store/auth/models'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import {
 	createSafeActionClient,
 	DEFAULT_SERVER_ERROR_MESSAGE,
@@ -35,8 +35,9 @@ const baseActionClient = createSafeActionClient({
 export const publicAction = baseActionClient
 	.use(async ({ next, ctx }) => {
 		const t = await getTranslations()
+		const locale = await getLocale()
 
-		return next({ ctx: { ...ctx, t } })
+		return next({ ctx: { ...ctx, t, locale } })
 	})
 	.use(async ({ next, clientInput, metadata }) => {
 		const startTime = performance.now()

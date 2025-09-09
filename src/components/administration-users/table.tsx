@@ -3,11 +3,10 @@
 import { authService } from "@/service/auth/service"
 import { DataTable } from "@/components/data-table/data-table"
 import * as React from "react"
-import { roles, User } from "@/store/auth/models"
+import { Role, roles, User } from "@/store/auth/models"
 import { Icons } from "../common/icons"
 import { useDataTable } from "@/hooks/use-data-table"
 import { DataTableColumnHeader } from "../data-table/data-table-column-header"
-import { DataTableToolbar } from "../data-table/data-table-toolbar"
 import { createColumns } from "@/lib/date-table/columns"
 import { Checkbox } from "../ui/checkbox"
 import { UsersTableActionBar } from "./table-action-bar"
@@ -25,13 +24,15 @@ import {
 	DropdownMenuTrigger
 } from "../ui/dropdown-menu"
 import { Button } from "../ui/button"
-import { CircleDashed, Ellipsis } from "lucide-react"
 import { toast } from "sonner"
 import { formatDate, getInitials, sleep } from "@/lib/utils"
 import { DataTableRowAction } from "@/lib/date-table/types"
 import { Badge } from "../ui/badge"
 import { DataTableDynamicToolbar } from "../data-table/data-table-dynamic-toolbar"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { updateRoleAction } from "@/actions/auth"
+import { Loader } from "../common/loader"
+import { emitCustomEvent } from "react-custom-events"
 
 interface Props {
 	promise: Promise<Awaited<ReturnType<typeof authService.listUsers>>>
@@ -173,9 +174,14 @@ export function Table({ promise }: Props) {
 							<Button
 								aria-label="Open menu"
 								variant="ghost"
+								disabled={isUpdatePending}
 								className="flex size-8 p-0 data-[state=open]:bg-muted ml-auto"
 							>
-								<Ellipsis className="size-4" aria-hidden="true" />
+								{isUpdatePending ? (
+									<Loader />
+								) : (
+									<Icons.ellipsis className="size-4" aria-hidden="true" />
+								)}
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-40">
@@ -192,8 +198,7 @@ export function Table({ promise }: Props) {
 										onValueChange={(value) => {
 											startUpdateTransition(() => {
 												toast.promise(
-													sleep(2000),
-													// call server action here
+													updateRoleAction({ userId: row.original.id, role: value as Role }),
 													{
 														loading: "Updating...",
 														success: "Label updated",
@@ -219,7 +224,7 @@ export function Table({ promise }: Props) {
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
 								// would open a delte dialog
-								onSelect={() => setRowAction({ row, variant: "delete" })}
+								onSelect={() => emitCustomEvent('delete-users-dialog', [row])}
 							>
 								Delete
 								<DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>

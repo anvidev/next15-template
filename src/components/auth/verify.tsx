@@ -38,7 +38,7 @@ export function Verify({ promise }: Props) {
 				<p className="text-center text-sm text-muted-foreground">
 					To protect your account and confirm your identity, we need to verify your email address. Please click the button below to complete the process and activate your account securely.
 				</p>
-				<Button className="w-full" onClick={() => execute({ token: verification.token })}>
+				<Button disabled={isExecuting} className="w-full" onClick={() => execute({ token: verification.token })}>
 					{isExecuting && <Loader />}
 					Confirm verification
 				</Button>

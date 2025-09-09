@@ -1,11 +1,14 @@
+import { AcceptInvitation } from '@/components/emails/accept-invitation'
 import { EmailTemplate } from '@/components/emails/verify-email'
 import { db } from '@/lib/database/connection'
-import { FROM, resend } from '@/lib/resend'
 import { ApplicationError } from '@/lib/safe-action'
 import { generateRandomString, slugify } from '@/lib/utils'
+import { ListUsersFilters, SignInInput, SignUpInput } from '@/schemas/auth'
 import { authStore } from '@/store/auth/data'
 import {
 	AccountProvider,
+	Invitation,
+	Role,
 	Session,
 	SessionPlatform,
 	Tenant,
@@ -13,17 +16,13 @@ import {
 	Verification,
 	VerificationType,
 } from '@/store/auth/models'
-import {
-	ListUsersFilters,
-	SignInInput,
-	SignUpInput,
-} from '@/store/auth/validations'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
 import { addDays, isWithinInterval, subDays } from 'date-fns'
 import { cookies } from 'next/headers'
 import { env } from 'process'
 import { cache } from 'react'
+import { emailService } from '../emails/emails'
 
 const SESSION_COOKIE = 'session'
 
@@ -234,24 +233,23 @@ export const authService = {
 				tx,
 			)
 
-			const { error } = await resend.emails.send({
-				from: FROM,
-				to: [newAdminUser.email],
-				subject: 'Welcome to [PROJ_NAME] - [TRANSLATE LATER]',
-				react: EmailTemplate({
+			const response = await emailService.sendRecursively(
+				[newAdminUser.email],
+				'Welcome to [PROJ_NAME] - [TRANSLATE LATER]',
+				EmailTemplate({
 					name: newAdminUser.name,
 					token: newVerification.token,
 					environment: env.NODE_ENV,
 				}),
-			})
-			if (error) {
+			)
+			if (response) {
 				try {
 					tx.rollback()
 				} catch (e) {}
 				throw new ApplicationError(
 					'Failed to send verification email',
 					'Service: Internal Server Error',
-					{ message: error.message, newAdminUser, newTenant },
+					{ message: response.message, newAdminUser, newTenant },
 				)
 			}
 
@@ -294,5 +292,52 @@ export const authService = {
 		filters: ListUsersFilters,
 	): Promise<{ users: User[]; pageCount: number }> {
 		return await authStore.listUsers(tenantId, filters)
+	},
+	updateUserRole: async function (
+		id: User['id'],
+		tenantId: Tenant['id'],
+		role: Role,
+	): Promise<User> {
+		return await authStore.updateUser(id, tenantId, {
+			role,
+		})
+	},
+	deleteUser: async function (
+		id: User['id'],
+		tenantId: Tenant['id'],
+	): Promise<void> {
+		const deleted = await authStore.deleteUser(id, tenantId)
+		if (!deleted) {
+			throw new ApplicationError('User was not found', 'Service: Not Found', {
+				id,
+				tenantId,
+			})
+		}
+	},
+	createInvitation: async function (
+		tenantId: Tenant['id'],
+		inviterId: User['id'],
+		email: string,
+		role: Role,
+		expiresInDays: number,
+	): Promise<Invitation> {
+		const invitation = await authStore.createInvitation({
+			id: generateRandomString(32, 'invitation_'),
+			token: generateRandomString(32),
+			expiresAt: addDays(new Date(), expiresInDays),
+			tenantId,
+			email,
+			inviterId,
+			role,
+		})
+		await emailService.sendRecursively(
+			[email],
+			'Invitation to [PROJ_NAME] - [TRANSLATE LATER]',
+			AcceptInvitation({
+				token: invitation.token,
+				environment: env.NODE_ENV,
+			}),
+		)
+		return invitation
 	},
 }

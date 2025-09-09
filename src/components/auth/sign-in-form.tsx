@@ -27,11 +27,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 import { Loader } from '../common/loader'
-import { signInValidation } from '@/store/auth/validations'
+import { signInValidation } from '@/schemas/auth'
 
 export function SignInForm() {
 	const router = useRouter()
-	const t = useTranslations('validation')
+	const t = useTranslations()
 	const signInSchema = signInValidation(t)
 	const { execute, isExecuting } = useAction(signInAction, {
 		onError({ error }) {
@@ -96,7 +96,7 @@ export function SignInForm() {
 				</Form>
 			</CardContent>
 			<CardFooter className='flex-col gap-2'>
-				<Button form='sign-in-form' type='submit' className='w-full'>
+				<Button disabled={isExecuting} form='sign-in-form' type='submit' className='w-full'>
 					{isExecuting && <Loader />}
 					Login
 				</Button>

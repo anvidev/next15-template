@@ -1,10 +1,12 @@
+import { DeleteUsersDialog } from '@/components/administration-users/delete-users-dialog'
+import { InviteUsersDialog } from '@/components/administration-users/invite-users-dialog'
 import { Table } from '@/components/administration-users/table'
 import { Icons } from '@/components/common/icons'
 import { Page } from '@/components/common/page'
 import { withAuth, WithAuthProps } from '@/components/common/with-auth'
 import { Button } from '@/components/ui/button'
+import { loadUsersSearchParams } from '@/schemas/auth'
 import { authService } from '@/service/auth/service'
-import { loadUsersSearchParams } from '@/store/auth/validations'
 import { SearchParams } from 'nuqs'
 import { Suspense } from 'react'
 
@@ -21,12 +23,7 @@ async function UsersPage({ t, tenant, searchParams }: Props) {
 			<Page.Header>
 				<Page.Title>{t('usersPage.title')}</Page.Title>
 				<Page.Actions>
-					<Button
-						size='icon'
-						variant='ghost'
-						className='size-7'>
-						<Icons.plus />
-					</Button>
+					<InviteUsersDialog />
 				</Page.Actions>
 			</Page.Header>
 			<Page.Content>
@@ -34,6 +31,7 @@ async function UsersPage({ t, tenant, searchParams }: Props) {
 					<Suspense fallback={<p>Loading users...</p>}>
 						<Table promise={users} />
 					</Suspense>
+					<DeleteUsersDialog />
 				</main>
 			</Page.Content>
 		</>

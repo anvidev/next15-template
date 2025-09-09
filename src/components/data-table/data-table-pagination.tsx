@@ -30,18 +30,18 @@ export function DataTablePagination<TData>({
 	return (
 		<div
 			className={cn(
-				"flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto sm:flex-row sm:gap-8",
+				"flex w-full items-center justify-between gap-4 overflow-auto sm:flex-row sm:gap-8",
 				className,
 			)}
 			{...props}
 		>
-			<div className="flex-1 whitespace-nowrap text-muted-foreground text-sm">
+			<div className="flex-1 whitespace-nowrap text-muted-foreground text-sm hidden md:block">
 				{table.getFilteredSelectedRowModel().rows.length} of{" "}
 				{table.getFilteredRowModel().rows.length} row(s) selected.
 			</div>
-			<div className="flex flex-col-reverse items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
+			<div className="flex flex-row justify-between md:justify-end items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8 w-full">
 				<div className="flex items-center space-x-2">
-					<p className="whitespace-nowrap font-medium text-sm">Rows per page</p>
+					<p className="whitespace-nowrap font-medium text-sm hidden md:block text-muted-foreground">Rows per page</p>
 					<Select
 						value={`${table.getState().pagination.pageSize}`}
 						onValueChange={(value) => {
@@ -60,7 +60,8 @@ export function DataTablePagination<TData>({
 						</SelectContent>
 					</Select>
 				</div>
-				<div className="flex items-center justify-center font-medium text-sm">
+				<div className="flex items-center gap-2">
+				<div className="flex items-center justify-center font-medium text-xs md:text-sm text-muted-foreground">
 					Page {table.getState().pagination.pageIndex + 1} of{" "}
 					{table.getPageCount()}
 				</div>
@@ -105,6 +106,7 @@ export function DataTablePagination<TData>({
 					>
 						<ChevronsRight />
 					</Button>
+				</div>
 				</div>
 			</div>
 		</div>

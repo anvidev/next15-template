@@ -26,7 +26,7 @@ type SchemaGetter<I, O> = (t: TFunc) => StandardSchemaV1<I, O>
  */
 export async function getServerSchema<I, O>(
 	schemaGetter: SchemaGetter<I, O>,
-	namespace: string,
+	namespace?: string,
 ) {
 	const t = await getTranslations(namespace)
 	return schemaGetter(t)

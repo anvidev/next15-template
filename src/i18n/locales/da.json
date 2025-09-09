@@ -9,11 +9,13 @@
 		"organization": "Organisation",
 		"billing": "Betaling"
 	},
-	"validation": {
+	"validations": {
 		"required": "Felt er påkrævet",
 		"min": "Skal være minimum {number} karakterer",
 		"max": "Må maks være {number} karakterer",
-		"email": "Skal være en gyldig e-mail"
+		"email": "Skal være en gyldig e-mail",
+		"invalid": "Ugyldig værdi",
+		"enum": "Vælg venligst fra listen"
 	},
 	"home": {
 		"title": "Hej verden!"

@@ -58,3 +58,13 @@ export type NewInvitation = typeof invitationsTable.$inferInsert
 
 export type Tenant = typeof tenantsTable.$inferSelect
 export type NewTenant = typeof tenantsTable.$inferInsert
+
+export function hasPermissionByRole(
+	userRole: Role,
+	requiredRole: Role,
+): boolean {
+	const userRank = roles.indexOf(userRole)
+	const requiredRank = roles.indexOf(requiredRole)
+
+	return userRank >= requiredRank
+}

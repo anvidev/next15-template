@@ -1,11 +1,13 @@
 import { db, Tx } from '@/lib/database/connection'
 import {
 	accountsTable,
+	invitationsTable,
 	sessionsTable,
 	tenantsTable,
 	usersTable,
 	verificationsTable,
 } from '@/lib/database/schema/auth'
+import { ListUsersFilters } from '@/schemas/auth'
 import {
 	and,
 	asc,
@@ -23,7 +25,9 @@ import {
 import {
 	Account,
 	AccountProvider,
+	Invitation,
 	NewAccount,
+	NewInvitation,
 	NewSession,
 	NewTenant,
 	NewUser,
@@ -33,7 +37,6 @@ import {
 	User,
 	Verification,
 } from './models'
-import { ListUsersFilters } from './validations'
 
 export const authStore = {
 	createSession: async function (
@@ -114,6 +117,29 @@ export const authStore = {
 	createUser: async function (input: NewUser, tx: Tx = db): Promise<User> {
 		const [user] = await tx.insert(usersTable).values(input).returning()
 		return user
+	},
+	updateUser: async function (
+		id: User['id'],
+		tenantId: Tenant['id'],
+		input: Partial<Omit<User, 'id' | 'tenantId'>>,
+		tx: Tx = db,
+	): Promise<User> {
+		const [user] = await tx
+			.update(usersTable)
+			.set({ ...input })
+			.where(and(eq(usersTable.id, id), eq(usersTable.tenantId, tenantId)))
+			.returning()
+		return user
+	},
+	deleteUser: async function (
+		id: User['id'],
+		tenantId: Tenant['id'],
+		tx: Tx = db,
+	): Promise<boolean> {
+		const result = await tx
+			.delete(usersTable)
+			.where(and(eq(usersTable.id, id), eq(usersTable.tenantId, tenantId)))
+		return result.rowsAffected == 1
 	},
 	listUsers: async function (
 		tenantId: Tenant['id'],
@@ -250,5 +276,15 @@ export const authStore = {
 				),
 			)
 		return rows.at(0)
+	},
+	createInvitation: async function (
+		input: NewInvitation,
+		tx: Tx = db,
+	): Promise<Invitation> {
+		const [invitation] = await tx
+			.insert(invitationsTable)
+			.values(input)
+			.returning()
+		return invitation
 	},
 }

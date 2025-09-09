@@ -4,6 +4,7 @@ import {
 	ChevronsUpDown,
 	Download,
 	Eclipse,
+	Ellipsis,
 	Home,
 	Languages,
 	List,
@@ -18,7 +19,7 @@ import {
 	ShieldUser,
 	Sparkle,
 	Sun,
-	Text,
+	Trash,
 	Type,
 	User,
 	Warehouse,
@@ -52,4 +53,6 @@ export const Icons = {
 	pyramid: (props: IconProps) => <Pyramid {...props} />,
 	type: (props: IconProps) => <Type {...props} />,
 	list: (props: IconProps) => <List {...props} />,
+	ellipsis: (props: IconProps) => <Ellipsis {...props} />,
+	trash: (props: IconProps) => <Trash {...props} />,
 }

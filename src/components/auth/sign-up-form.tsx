@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Link, useRouter } from '@/i18n/navigation'
-import { signUpValidation } from '@/store/auth/validations'
+import { signUpValidation } from '@/schemas/auth'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { useAction } from 'next-safe-action/hooks'
@@ -133,7 +133,7 @@ export function SignUpForm() {
 				</Form>
 			</CardContent>
 			<CardFooter className='flex-col gap-2'>
-				<Button form='sign-in-form' type='submit' className='w-full'>
+				<Button disabled={isExecuting} form='sign-in-form' type='submit' className='w-full'>
 					{isExecuting && <Icons.loader className='animate-spin' />}
 					Create
 				</Button>

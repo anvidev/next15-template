@@ -1,19 +1,23 @@
 'use server'
 
-import { publicAction } from '@/lib/safe-action'
+import { adminAction, publicAction } from '@/lib/safe-action'
 import { sleep } from '@/lib/utils'
 import { getServerSchema } from '@/lib/validations'
-import { authService } from '@/service/auth/service'
-import { SessionPlatform } from '@/store/auth/models'
 import {
+	deleteUserValidation,
+	inviteUsersValidation,
 	signInValidation,
 	signUpValidation,
+	updateUserRoleValidation,
 	verifyValidation,
-} from '@/store/auth/validations'
+} from '@/schemas/auth'
+import { authService } from '@/service/auth/service'
+import { SessionPlatform } from '@/store/auth/models'
 import { flattenValidationErrors } from 'next-safe-action'
+import { revalidatePath } from 'next/cache'
 
 async function getSignUpSchema() {
-	return getServerSchema(signUpValidation, 'validation')
+	return getServerSchema(signUpValidation)
 }
 
 export const signUpAction = publicAction
@@ -27,7 +31,7 @@ export const signUpAction = publicAction
 	})
 
 async function getSignInSchema() {
-	return await getServerSchema(signInValidation, 'validation')
+	return await getServerSchema(signInValidation)
 }
 
 export const signInAction = publicAction
@@ -46,7 +50,7 @@ export const signInAction = publicAction
 	})
 
 async function getVerifySchema() {
-	return await getServerSchema(verifyValidation, 'validation')
+	return await getServerSchema(verifyValidation)
 }
 
 export const verifyAction = publicAction
@@ -61,4 +65,60 @@ export const verifyAction = publicAction
 			SessionPlatform.Web,
 		)
 		await authService.setSessionCookie(newSession.token)
+	})
+
+async function getUpdateRoleSchema() {
+	return await getServerSchema(updateUserRoleValidation)
+}
+
+export const updateRoleAction = adminAction
+	.metadata({ actionName: 'updateRoleAction' })
+	.inputSchema(getUpdateRoleSchema)
+	.action(async ({ parsedInput, ctx }) => {
+		const { tenant, locale } = ctx
+		const { userId, role } = parsedInput
+		await authService.updateUserRole(userId, tenant.id, role)
+		revalidatePath(`/${locale}/administration/users`)
+	})
+
+async function getDeleteUserSchema() {
+	return await getServerSchema(deleteUserValidation)
+}
+
+export const deleteUsersAction = adminAction
+	.metadata({ actionName: 'deleteUsersAction' })
+	.inputSchema(getDeleteUserSchema)
+	.action(async ({ parsedInput, ctx }) => {
+		const { tenant, locale } = ctx
+		const { ids } = parsedInput
+		for (const id of ids) {
+			await authService.deleteUser(id, tenant.id)
+		}
+		revalidatePath(`/${locale}/administration/users`)
+	})
+
+async function getInviteUsersSchema() {
+	return await getServerSchema(inviteUsersValidation)
+}
+
+export const inviteUsersAction = adminAction
+	.metadata({ actionName: 'inviteUsersAction' })
+	.inputSchema(getInviteUsersSchema)
+	.action(async ({ parsedInput, ctx }) => {
+		const { tenant, user, locale } = ctx
+		const { emails, expiresInDays, role } = parsedInput
+		const invitationPromises = []
+		for (const email of emails) {
+			invitationPromises.push(
+				authService.createInvitation(
+					tenant.id,
+					user.id,
+					email,
+					role,
+					expiresInDays,
+				),
+			)
+		}
+		await Promise.all(invitationPromises)
+		revalidatePath(`/${locale}/administration/users`)
 	})

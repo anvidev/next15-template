@@ -10,8 +10,8 @@ export function AcceptInvitation({ token, environment = 'development' }: EmailTe
 	const verlUrl = env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
 	const port = env.PORT ?? 3000
 	const verifyUrl = environment == 'production'
-		? `https://${verlUrl}/invitation/${token}`
-		: `http://localhost:${port}/invitation/${token}`
+		? `https://${verlUrl}/invite/${token}`
+		: `http://localhost:${port}/invite/${token}`
 
 	return (
 		<div>

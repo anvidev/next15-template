@@ -1,4 +1,4 @@
-import { AcceptInvitation } from '@/components/emails/accept-invitation'
+import { AcceptInvitation } from '@/components/emails/accept-invite'
 import { EmailTemplate } from '@/components/emails/verify-email'
 import { db } from '@/lib/database/connection'
 import { ApplicationError } from '@/lib/safe-action'
@@ -8,6 +8,7 @@ import { authStore } from '@/store/auth/data'
 import {
 	AccountProvider,
 	Invitation,
+	InvitationStatus,
 	Role,
 	Session,
 	SessionPlatform,
@@ -81,6 +82,21 @@ export const authService = {
 				'Invalid credentials',
 				'Service: Unauthorized',
 				{ message: 'User was not found', email },
+			)
+		}
+
+		if (!user.active) {
+			throw new ApplicationError('User is deactivated', 'Service: Forbidden', {
+				message: 'User is deactivated',
+				email,
+			})
+		}
+
+		if (!user.emailVerified) {
+			throw new ApplicationError(
+				'User has not verified their email',
+				'Service: Forbidden',
+				{ message: 'Users email is not verified', email },
 			)
 		}
 
@@ -339,5 +355,80 @@ export const authService = {
 			}),
 		)
 		return invitation
+	},
+	getInvitation: async function (token: string): Promise<Invitation> {
+		const invitation = await authStore.getInvitation(token)
+		if (!invitation) {
+			throw new ApplicationError(
+				'Invitation token was not found or has already been used',
+				'Service: Not Found',
+				{ token },
+			)
+		}
+		return invitation
+	},
+	acceptInvitation: async function (
+		token: string,
+		name: string,
+		email: string,
+		password: string,
+	): Promise<{ invitation: Invitation; user: User }> {
+		const { invitation, user } = await db.transaction(async tx => {
+			let invitation = await authStore.getInvitation(token, tx)
+			if (!invitation) {
+				throw new ApplicationError(
+					'Invitation token was not found or has already been used',
+					'Service: Not Found',
+					{ token },
+				)
+			}
+
+			if (invitation.email !== email) {
+				throw new ApplicationError(
+					'Invited email does not match email received',
+					'Service: Forbidden',
+					{ token, invitedEmail: invitation.email, receivedEmail: email },
+				)
+			}
+
+			const newUser = await authStore.createUser(
+				{
+					id: generateRandomString(32, 'user_'),
+					tenantId: invitation.tenantId,
+					role: invitation.role,
+					emailVerified: true,
+					active: true,
+					email,
+					name,
+				},
+				tx,
+			)
+
+			const passwordHash = await bcrypt.hash(password, 12)
+
+			await authStore.createAccount(
+				{
+					id: generateRandomString(32, 'account_'),
+					provider: AccountProvider.Credential,
+					userId: newUser.id,
+					passwordHash: passwordHash,
+				},
+				tx,
+			)
+
+			invitation = await authStore.updateInvitation(
+				token,
+				{
+					acceptedAt: new Date(),
+					userId: newUser.id,
+					status: InvitationStatus.Accepted,
+				},
+				tx,
+			)
+
+			return { invitation, user: newUser }
+		})
+
+		return { invitation, user }
 	},
 }

@@ -35,10 +35,11 @@ import { Loader } from "../common/loader"
 import { emitCustomEvent } from "react-custom-events"
 
 interface Props {
+	user: User
 	promise: Promise<Awaited<ReturnType<typeof authService.listUsers>>>
 }
 
-export function Table({ promise }: Props) {
+export function Table({ promise, user }: Props) {
 	const { users, pageCount } = React.use(promise)
 
 	const columns = createColumns<User>((c, _t) => [
@@ -104,6 +105,24 @@ export function Table({ promise }: Props) {
 			},
 			enableColumnFilter: true,
 		}),
+		c.accessor('role', {
+			id: 'role',
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title="Role" />
+			),
+			cell: ({ getValue }) => getValue().charAt(0).toUpperCase() + getValue().slice(1),
+			meta: {
+				label: 'Role',
+				icon: Icons.list,
+				variant: 'multiSelect',
+				placeholder: 'Choose roles',
+				options: roles.map(r => ({
+					label: r.charAt(0).toUpperCase() + r.slice(1),
+					value: r,
+				}))
+			},
+			enableColumnFilter: true,
+		}),
 		c.accessor('emailVerified', {
 			id: "emailVerified",
 			header: ({ column }) => (
@@ -129,21 +148,28 @@ export function Table({ promise }: Props) {
 			},
 			enableColumnFilter: true,
 		}),
-		c.accessor('role', {
-			id: 'role',
+		c.accessor('active', {
+			id: "active",
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Role" />
+				<DataTableColumnHeader column={column} title="Status" />
 			),
-			cell: ({ getValue }) => getValue().charAt(0).toUpperCase() + getValue().slice(1),
+			cell: ({ cell }) => {
+				const active = cell.row.original.active
+				return (
+					<Badge variant="outline" className="py-1 [&>svg]:size-3.5">
+						{active ? <Icons.check className="text-success" /> : <Icons.cross className="text-destructive" />}
+						<span className="capitalize">{active ? 'Activated' : 'Deactivated'}</span>
+					</Badge>
+				);
+			},
 			meta: {
-				label: 'Role',
+				label: "Status",
+				variant: "select",
+				options: [
+					{ label: 'Activated', value: String(true), icon: Icons.check },
+					{ label: 'Deactivated', value: String(false), icon: Icons.cross },
+				],
 				icon: Icons.list,
-				variant: 'multiSelect',
-				placeholder: 'Choose roles',
-				options: roles.map(r => ({
-					label: r.charAt(0).toUpperCase() + r.slice(1),
-					value: r,
-				}))
 			},
 			enableColumnFilter: true,
 		}),
@@ -174,7 +200,7 @@ export function Table({ promise }: Props) {
 							<Button
 								aria-label="Open menu"
 								variant="ghost"
-								disabled={isUpdatePending}
+								disabled={isUpdatePending || row.original.id === user.id}
 								className="flex size-8 p-0 data-[state=open]:bg-muted ml-auto"
 							>
 								{isUpdatePending ? (
@@ -221,13 +247,46 @@ export function Table({ promise }: Props) {
 									</DropdownMenuRadioGroup>
 								</DropdownMenuSubContent>
 							</DropdownMenuSub>
+							<DropdownMenuSub>
+								<DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
+								<DropdownMenuSubContent>
+									<DropdownMenuRadioGroup
+										value={row.original.active.toString()}
+										onValueChange={(value) => {
+											startUpdateTransition(() => {
+												toast.promise(
+													sleep(2000),
+													{
+														loading: "Updating...",
+														success: "Label updated",
+														error: (err) => "get error message"
+													},
+												);
+											});
+										}}
+									>
+										<DropdownMenuRadioItem
+											value="true"
+											className="capitalize"
+											disabled={isUpdatePending}
+										>
+											Activate
+										</DropdownMenuRadioItem>
+										<DropdownMenuRadioItem
+											value="false"
+											className="capitalize"
+											disabled={isUpdatePending}
+										>
+											Deactivate
+										</DropdownMenuRadioItem>
+									</DropdownMenuRadioGroup>
+								</DropdownMenuSubContent>
+							</DropdownMenuSub>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
-								// would open a delte dialog
 								onSelect={() => emitCustomEvent('delete-users-dialog', [row])}
 							>
 								Delete
-								<DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

@@ -1,10 +1,8 @@
 import { DeleteUsersDialog } from '@/components/administration-users/delete-users-dialog'
 import { InviteUsersDialog } from '@/components/administration-users/invite-users-dialog'
 import { Table } from '@/components/administration-users/table'
-import { Icons } from '@/components/common/icons'
 import { Page } from '@/components/common/page'
 import { withAuth, WithAuthProps } from '@/components/common/with-auth'
-import { Button } from '@/components/ui/button'
 import { loadUsersSearchParams } from '@/schemas/auth'
 import { authService } from '@/service/auth/service'
 import { SearchParams } from 'nuqs'
@@ -14,7 +12,7 @@ interface Props extends WithAuthProps {
 	searchParams: Promise<SearchParams>;
 }
 
-async function UsersPage({ t, tenant, searchParams }: Props) {
+async function UsersPage({ t, tenant, user, searchParams }: Props) {
 	const filters = await loadUsersSearchParams(searchParams);
 	console.log("filters", filters)
 	const users = authService.listUsers(tenant.id, filters)
@@ -29,7 +27,7 @@ async function UsersPage({ t, tenant, searchParams }: Props) {
 			<Page.Content>
 				<main className='grow relative'>
 					<Suspense fallback={<p>Loading users...</p>}>
-						<Table promise={users} />
+						<Table user={user} promise={users} />
 					</Suspense>
 					<DeleteUsersDialog />
 				</main>

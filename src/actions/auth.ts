@@ -1,9 +1,9 @@
 'use server'
 
 import { adminAction, publicAction } from '@/lib/safe-action'
-import { sleep } from '@/lib/utils'
 import { getServerSchema } from '@/lib/validations'
 import {
+	acceptAndRegisterValidation,
 	deleteUserValidation,
 	inviteUsersValidation,
 	signInValidation,
@@ -58,7 +58,6 @@ export const verifyAction = publicAction
 	.inputSchema(getVerifySchema)
 	.action(async ({ parsedInput }) => {
 		const { token } = parsedInput
-		await sleep(3000)
 		const verification = await authService.confirmVerification(token)
 		const newSession = await authService.createSession(
 			verification.userId,
@@ -89,9 +88,10 @@ export const deleteUsersAction = adminAction
 	.metadata({ actionName: 'deleteUsersAction' })
 	.inputSchema(getDeleteUserSchema)
 	.action(async ({ parsedInput, ctx }) => {
-		const { tenant, locale } = ctx
+		const { tenant, user, locale } = ctx
 		const { ids } = parsedInput
 		for (const id of ids) {
+			if (id === user.id) continue
 			await authService.deleteUser(id, tenant.id)
 		}
 		revalidatePath(`/${locale}/administration/users`)
@@ -106,14 +106,14 @@ export const inviteUsersAction = adminAction
 	.inputSchema(getInviteUsersSchema)
 	.action(async ({ parsedInput, ctx }) => {
 		const { tenant, user, locale } = ctx
-		const { emails, expiresInDays, role } = parsedInput
+		const { invitations, expiresInDays, role } = parsedInput
 		const invitationPromises = []
-		for (const email of emails) {
+		for (const invitation of invitations) {
 			invitationPromises.push(
 				authService.createInvitation(
 					tenant.id,
 					user.id,
-					email,
+					invitation.email,
 					role,
 					expiresInDays,
 				),
@@ -121,4 +121,26 @@ export const inviteUsersAction = adminAction
 		}
 		await Promise.all(invitationPromises)
 		revalidatePath(`/${locale}/administration/users`)
+	})
+
+async function getAcceptInviteSchema() {
+	return await getServerSchema(acceptAndRegisterValidation)
+}
+
+export const acceptInviteAction = publicAction
+	.metadata({ actionName: 'acceptInviteAction' })
+	.inputSchema(getAcceptInviteSchema)
+	.action(async ({ parsedInput }) => {
+		const { token, name, email, password } = parsedInput
+		const { user } = await authService.acceptInvitation(
+			token,
+			name,
+			email,
+			password,
+		)
+		const newSession = await authService.createSession(
+			user.id,
+			SessionPlatform.Web,
+		)
+		await authService.setSessionCookie(newSession.token)
 	})

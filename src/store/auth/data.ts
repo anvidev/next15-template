@@ -171,6 +171,9 @@ export const authStore = {
 		if (typeof filters.emailVerified === 'boolean') {
 			conditions.push(eq(usersTable.emailVerified, filters.emailVerified))
 		}
+		if (typeof filters.active === 'boolean') {
+			conditions.push(eq(usersTable.active, filters.active))
+		}
 		if (filters.createdAt?.length === 2) {
 			const [startDate, endDate] = filters.createdAt
 			const endOfDay = new Date(endDate)
@@ -284,6 +287,35 @@ export const authStore = {
 		const [invitation] = await tx
 			.insert(invitationsTable)
 			.values(input)
+			.returning()
+		return invitation
+	},
+	getInvitation: async function (
+		token: string,
+		tx: Tx = db,
+	): Promise<Invitation | undefined> {
+		const rows = await tx
+			.select()
+			.from(invitationsTable)
+			.where(
+				and(
+					eq(invitationsTable.token, token),
+					isNull(invitationsTable.acceptedAt),
+				),
+			)
+		return rows.at(0)
+	},
+	updateInvitation: async function (
+		token: Invitation['token'],
+		input: Partial<Pick<Invitation, 'acceptedAt' | 'userId' | 'status'>>,
+		tx: Tx = db,
+	): Promise<Invitation> {
+		const [invitation] = await tx
+			.update(invitationsTable)
+			.set({
+				...input,
+			})
+			.where(eq(invitationsTable.token, token))
 			.returning()
 		return invitation
 	},

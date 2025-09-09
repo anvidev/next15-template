@@ -50,6 +50,7 @@ export const usersSearchParams = {
 	name: parseAsString.withDefault(''),
 	email: parseAsString.withDefault(''),
 	emailVerified: parseAsBoolean,
+	active: parseAsBoolean,
 	role: parseAsArrayOf(rolesSchema),
 	createdAt: parseAsArrayOf(parseAsTimestamp),
 }
@@ -76,9 +77,29 @@ export type DeleteUserInput = z.infer<ReturnType<typeof deleteUserValidation>>
 
 export function inviteUsersValidation(t: TFunc) {
 	return z.object({
-		emails: z.array(z.email({ error: t('validations.email') })),
-		expiresInDays: z.number({ error: t('validations.invalid') }),
+		invitations: z
+			.array(
+				z.object({
+					email: z.email({ error: t('validations.email') }),
+				}),
+			)
+			.min(1)
+			.max(10),
+		expiresInDays: z
+			.transform(Number)
+			.pipe(z.number({ error: t('validations.invalid') })),
 		role: z.enum(Role, { error: t('validations.enum') }),
 	})
 }
 export type InviteUsersInput = z.infer<ReturnType<typeof inviteUsersValidation>>
+
+export function acceptAndRegisterValidation(t: TFunc) {
+	return z.object({
+		token: z.string({ error: t('validations.required') }),
+		name: z.string({ error: t('validations.required') }),
+		email: z.email({ error: t('validations.email') }),
+		password: z
+			.string({ error: t('validations.required') })
+			.min(8, { error: t('validations.min', { number: 8 }) }),
+	})
+}

@@ -318,6 +318,15 @@ export const authService = {
 			role,
 		})
 	},
+	updateUserStatus: async function (
+		id: User['id'],
+		tenantId: Tenant['id'],
+		active: boolean,
+	): Promise<User> {
+		return await authStore.updateUser(id, tenantId, {
+			active,
+		})
+	},
 	deleteUser: async function (
 		id: User['id'],
 		tenantId: Tenant['id'],

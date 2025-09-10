@@ -48,7 +48,7 @@ export function DataTableViewOptions<TData>({
 					className="ml-auto hidden h-8 lg:flex"
 				>
 					<Settings2 className="size-3.5" />
-					View
+					<span className="text-xs">View</span>
 					<ChevronsUpDown className="ml-auto opacity-50 size-3.5" />
 				</Button>
 			</PopoverTrigger>

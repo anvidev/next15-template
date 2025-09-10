@@ -1,5 +1,6 @@
 "use client";
 
+import { roles } from "@/store/auth/models"
 import type { Table } from "@tanstack/react-table";
 import * as React from "react";
 import {
@@ -12,6 +13,15 @@ import { exportTableToCSV } from "@/lib/date-table/export";
 import { User } from "@/store/auth/models";
 import { Icons } from "../common/icons";
 import { emitCustomEvent } from "react-custom-events";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger
+} from "@/components/ui/select";
+import { Button } from "../ui/button";
+import { CheckCircle2 } from "lucide-react";
 
 const actions = [
 	"update-status",
@@ -64,7 +74,7 @@ export function UsersTableActionBar({ table }: Props) {
 				</DataTableActionBarAction>
 				<DataTableActionBarAction
 					size="icon"
-					tooltip="Export tasks"
+					tooltip={`Delete ${rows.length > 1 ? "users" : "user"}`}
 					onClick={() => emitCustomEvent('delete-users-dialog', rows)}
 				>
 					<Icons.trash />

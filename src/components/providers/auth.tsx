@@ -1,6 +1,5 @@
 "use client"
 
-import { tryCatch } from "@/lib/try-catch";
 import { Session, Tenant, User } from "@/store/auth/models";
 import { createContext, PropsWithChildren, useContext } from "react";
 

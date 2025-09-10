@@ -9,6 +9,7 @@ import {
 	signInValidation,
 	signUpValidation,
 	updateUserRoleValidation,
+	updateUserStatusValidation,
 	verifyValidation,
 } from '@/schemas/auth'
 import { authService } from '@/service/auth/service'
@@ -74,9 +75,12 @@ export const updateRoleAction = adminAction
 	.metadata({ actionName: 'updateRoleAction' })
 	.inputSchema(getUpdateRoleSchema)
 	.action(async ({ parsedInput, ctx }) => {
-		const { tenant, locale } = ctx
-		const { userId, role } = parsedInput
-		await authService.updateUserRole(userId, tenant.id, role)
+		const { user, tenant, locale } = ctx
+		const { ids, role } = parsedInput
+		for (const id of ids) {
+			if (id === user.id) continue
+			await authService.updateUserRole(id, tenant.id, role)
+		}
 		revalidatePath(`/${locale}/administration/users`)
 	})
 
@@ -143,4 +147,21 @@ export const acceptInviteAction = publicAction
 			SessionPlatform.Web,
 		)
 		await authService.setSessionCookie(newSession.token)
+	})
+
+async function getUpdateStatusSchema() {
+	return await getServerSchema(updateUserStatusValidation)
+}
+
+export const updateStatusAction = adminAction
+	.metadata({ actionName: 'updateStatusAction' })
+	.inputSchema(getUpdateStatusSchema)
+	.action(async ({ parsedInput, ctx }) => {
+		const { user, tenant, locale } = ctx
+		const { ids, active } = parsedInput
+		for (const id of ids) {
+			if (user.id === id) continue
+			await authService.updateUserStatus(id, tenant.id, active)
+		}
+		revalidatePath(`/${locale}/administration/users`)
 	})

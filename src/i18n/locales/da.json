@@ -15,7 +15,8 @@
 		"max": "Må maks være {number} karakterer",
 		"email": "Skal være en gyldig e-mail",
 		"invalid": "Ugyldig værdi",
-		"enum": "Vælg venligst fra listen"
+		"enum": "Vælg venligst fra listen",
+		"boolean": "Værdi skal være sandt eller falsk"
 	},
 	"home": {
 		"title": "Hej verden!"

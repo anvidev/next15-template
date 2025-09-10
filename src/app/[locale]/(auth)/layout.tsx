@@ -1,9 +1,25 @@
 import { Icons } from '@/components/common/icons'
+import { redirect } from '@/i18n/navigation'
+import { authService } from '@/service/auth/service'
 import React from 'react'
 
 export default async function AuthLayout({
 	children,
-}: Readonly<{ children: React.ReactNode }>) {
+	params,
+}: Readonly<{
+	children: React.ReactNode
+	params: Promise<{ locale: string }>
+}>) {
+	const { locale } = await params
+	const { session } = await authService.verify()
+
+	if (session) {
+		redirect({
+			href: "/",
+			locale
+		})
+	}
+
 	return (
 		<main className='min-h-screen w-full bg-transparent relative overflow-hidden grid place-items-center'>
 			<div

@@ -12,7 +12,8 @@
 		"max": "Value cannot exceed {number} characters",
 		"email": "Value must be a valid email",
 		"invalid": "Value is not a valid one",
-		"enum": "Choose from the list"
+		"enum": "Choose from the list",
+		"boolean": "Must be either true or false"
 	},
 	"home": {
 		"title": "Hello world!"

@@ -20,7 +20,7 @@ export function DataTableExportData<TData>({ table }: DataTableExportDataProps<T
 			onClick={() => exportTableToCSV(table, { excludeColumns: ['select', 'actions'] })}
 		>
 			<Icons.download className="size-3.5" />
-			Export
+			<span className="text-xs">Export</span>
 		</Button>
 	)
 }

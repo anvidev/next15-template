@@ -29,9 +29,7 @@ import { deleteUsersAction } from "@/actions/auth";
 import { toast } from "sonner";
 import { Loader } from "../common/loader";
 
-interface Props extends React.ComponentPropsWithoutRef<typeof Dialog> { }
-
-export function DeleteUsersDialog({ ...props }: Props) {
+export function DeleteUsersDialog() {
 	const [rows, setRows] = useState<Row<User>[]>([])
 	const isMobile = useIsMobile();
 
@@ -59,7 +57,7 @@ export function DeleteUsersDialog({ ...props }: Props) {
 	}
 
 	if (isMobile) {
-		<Drawer {...props} open={rows.length > 0} onOpenChange={onOpenChange}>
+		<Drawer open={rows.length > 0} onOpenChange={onOpenChange}>
 			<DrawerContent>
 				<DrawerHeader>
 					<DrawerTitle>Are you absolutely sure?</DrawerTitle>
@@ -87,7 +85,7 @@ export function DeleteUsersDialog({ ...props }: Props) {
 	}
 
 	return (
-		<Dialog {...props} open={rows.length > 0} onOpenChange={onOpenChange}>
+		<Dialog open={rows.length > 0} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Are you absolutely sure?</DialogTitle>

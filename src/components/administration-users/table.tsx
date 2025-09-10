@@ -17,7 +17,6 @@ import {
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
-	DropdownMenuShortcut,
 	DropdownMenuSub,
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
@@ -30,7 +29,7 @@ import { DataTableRowAction } from "@/lib/date-table/types"
 import { Badge } from "../ui/badge"
 import { DataTableDynamicToolbar } from "../data-table/data-table-dynamic-toolbar"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { updateRoleAction } from "@/actions/auth"
+import { updateRoleAction, updateStatusAction } from "@/actions/auth"
 import { Loader } from "../common/loader"
 import { emitCustomEvent } from "react-custom-events"
 
@@ -42,7 +41,7 @@ interface Props {
 export function Table({ promise, user }: Props) {
 	const { users, pageCount } = React.use(promise)
 
-	const columns = createColumns<User>((c, _t) => [
+	const columns = createColumns<User>(c => [
 		c.display({
 			id: "select",
 			header: ({ table }) => (
@@ -190,9 +189,7 @@ export function Table({ promise, user }: Props) {
 		c.display({
 			id: "actions",
 			cell: function Cell({ row }) {
-				const [isUpdatePending, startUpdateTransition] = React.useTransition();
-				const [rowAction, setRowAction] =
-					React.useState<DataTableRowAction<User> | null>(null);
+				const [pending, startUpdateTransition] = React.useTransition();
 
 				return (
 					<DropdownMenu>
@@ -200,10 +197,10 @@ export function Table({ promise, user }: Props) {
 							<Button
 								aria-label="Open menu"
 								variant="ghost"
-								disabled={isUpdatePending || row.original.id === user.id}
+								disabled={pending || row.original.id === user.id}
 								className="flex size-8 p-0 data-[state=open]:bg-muted ml-auto"
 							>
-								{isUpdatePending ? (
+								{pending ? (
 									<Loader />
 								) : (
 									<Icons.ellipsis className="size-4" aria-hidden="true" />
@@ -211,9 +208,7 @@ export function Table({ promise, user }: Props) {
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-40">
-							<DropdownMenuItem
-								onSelect={() => setRowAction({ row, variant: "update" })}
-							>
+							<DropdownMenuItem>
 								Edit
 							</DropdownMenuItem>
 							<DropdownMenuSub>
@@ -224,11 +219,11 @@ export function Table({ promise, user }: Props) {
 										onValueChange={(value) => {
 											startUpdateTransition(() => {
 												toast.promise(
-													updateRoleAction({ userId: row.original.id, role: value as Role }),
+													updateRoleAction({ ids: [row.original.id], role: value as Role }),
 													{
-														loading: "Updating...",
-														success: "Label updated",
-														error: (err) => "get error message"
+														loading: `Change role for ${row.original.name}`,
+														success: `Role changed for ${row.original.name}`,
+														error: `Could not change role for ${row.original.name}`
 													},
 												);
 											});
@@ -239,7 +234,7 @@ export function Table({ promise, user }: Props) {
 												key={label}
 												value={label}
 												className="capitalize"
-												disabled={isUpdatePending}
+												disabled={pending}
 											>
 												{label}
 											</DropdownMenuRadioItem>
@@ -255,11 +250,11 @@ export function Table({ promise, user }: Props) {
 										onValueChange={(value) => {
 											startUpdateTransition(() => {
 												toast.promise(
-													sleep(2000),
+													updateStatusAction({ ids: [row.original.id], active: value === "true" }),
 													{
-														loading: "Updating...",
-														success: "Label updated",
-														error: (err) => "get error message"
+														loading: `Change status for ${row.original.name}`,
+														success: `Status changed for ${row.original.name}`,
+														error: `Could not change status for ${row.original.name}`
 													},
 												);
 											});
@@ -268,14 +263,14 @@ export function Table({ promise, user }: Props) {
 										<DropdownMenuRadioItem
 											value="true"
 											className="capitalize"
-											disabled={isUpdatePending}
+											disabled={pending}
 										>
 											Activate
 										</DropdownMenuRadioItem>
 										<DropdownMenuRadioItem
 											value="false"
 											className="capitalize"
-											disabled={isUpdatePending}
+											disabled={pending}
 										>
 											Deactivate
 										</DropdownMenuRadioItem>

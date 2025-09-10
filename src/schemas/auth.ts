@@ -60,7 +60,7 @@ export type ListUsersFilters = Awaited<ReturnType<typeof loadUsersSearchParams>>
 
 export function updateUserRoleValidation(t: TFunc) {
 	return z.object({
-		userId: z.string({ error: t('validations.required') }),
+		ids: z.array(z.string({ error: t('validations.required') })).min(1),
 		role: z.enum(Role, { error: t('validations.invalid') }),
 	})
 }
@@ -103,3 +103,13 @@ export function acceptAndRegisterValidation(t: TFunc) {
 			.min(8, { error: t('validations.min', { number: 8 }) }),
 	})
 }
+
+export function updateUserStatusValidation(t: TFunc) {
+	return z.object({
+		ids: z.array(z.string({ error: t('validations.required') })).min(1),
+		active: z.coerce.boolean({ error: t('validations.boolean') }),
+	})
+}
+export type UpdateUserStatusInput = z.infer<
+	ReturnType<typeof updateUserStatusValidation>
+>

@@ -226,39 +226,39 @@ function InviteForm({
 				</div>
 				<div className="space-y-2">
 					{fields.map((field, index) => (
-						<div
-							className="flex items-end gap-2"
-							key={field.id}>
-							<FormField
-								control={form.control}
-								name={`invitations.${index}.email`}
-								render={({ field }) => (
-									<FormItem className="grow">
-										<FormLabel className={cn(index !== 0 && 'sr-only')}>Email</FormLabel>
-										<FormControl>
+						<FormField
+							control={form.control}
+							key={field.id}
+							name={`invitations.${index}.email`}
+							render={({ field }) => (
+								<FormItem className="grow">
+									<FormLabel className={cn(index !== 0 && 'sr-only')}>Email</FormLabel>
+									<FormControl>
+										<div className="flex items-center gap-2">
 											<Input placeholder="Email of user..." {...field} />
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<Button
-								type="button"
-								variant='outline'
-								size='icon'
-								disabled={index === 0 || isExecuting}
-								onClick={() => remove(index)}>
-								<Icons.cross />
-								<p className="sr-only">Remove email</p>
-							</Button>
-						</div>
+											<Button
+												type="button"
+												variant='outline'
+												size='icon'
+												disabled={index === 0 || isExecuting}
+												className={cn(index === 0 && "self-end")}
+												onClick={() => remove(index)}>
+												<Icons.cross />
+												<p className="sr-only">Remove email</p>
+											</Button>
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					))}
 				</div>
 				<Button
 					type="button"
 					variant="secondary"
 					onClick={() => append({ email: "" })}
-					disabled={fields.length >= 10 || isExecuting}>Add field</Button>
+					disabled={fields.length >= 10 || isExecuting}>Add email</Button>
 			</form>
 		</Form>
 	)

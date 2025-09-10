@@ -22,6 +22,72 @@
 		"title": "Hej verden!"
 	},
 	"usersPage": {
-		"title": "Brugere"
+		"title": "Brugere",
+		"inviteUsersDialog": {
+			"title": "Inviter brugere",
+			"description": "Brugere vil modtage en mail med et registrerings link",
+			"expiryOptionOne": "1 dag",
+			"expiryOptionTwo": "3 dage",
+			"expiryOptionThree": "7 dage",
+			"cancelButton": "Luk",
+			"confirmButton": "Inviter",
+			"expiryLabel": "Udløbsperiode",
+			"roleLabel": "Rolle",
+			"emailLabel": "Email",
+			"emailPlaceholder": "Brugerens email...",
+			"emailRemoveButton": "Fjern email",
+			"emailAddButton": "Tilføj email",
+			"errorToast": "Der gik noget galt med at sende invitationer",
+			"successToast": "{count, plural, =1 {1 bruger} other {# brugere}} blev inviteret"
+		},
+		"deleteUsersDialog": {
+			"title": "Vil du slette {count, plural, =1 {brugeren} other {# brugere}}",
+			"description": "Denne handling er permanent og kan ikke laves om",
+			"cancelButton": "Luk",
+			"confirmButton": "Slet",
+			"errorToast": "Der gik noget galt med sletningen",
+			"successToast": "{count, plural, =1 {1 bruger} other {# brugere}} blev slettet"
+		},
+		"usersTable": {
+			"selectAll": "Vælg alle brugere",
+			"selectOne": "Vælg bruger",
+			"name": {
+				"title": "Navn",
+				"placeholder": "Søg efter navn..."
+			},
+			"email": {
+				"title": "Email",
+				"placeholder": "Søg efter email..."
+			},
+			"role": {
+				"title": "Rolle",
+				"placeholder": "Vælg rolle",
+				"loadingPromise": "Skifter rolle for {name}",
+				"successPromise": "Skiftet rolle for {name}",
+				"errorPromise": "Kunne ikke skifte rolle for {name}"
+			},
+			"emailVerified": {
+				"title": "Bekræftet",
+				"placeholder": "Vælg en status",
+				"optionOne": "Bekræftet",
+				"optionTwo": "Ikke bekræftet"
+			},
+			"active": {
+				"title": "Status",
+				"placeholder": "Vælg en status",
+				"optionOne": "Aktiveret",
+				"optionTwo": "Deaktiveret",
+				"loadingPromise": "Skifter status for {name}",
+				"successPromise": "Skiftet status for {name}",
+				"errorPromise": "Kunne ikke skifte status for {name}",
+				"promiseOptionOne": "Aktiver",
+				"promiseOptionTwo": "Deaktiver"
+			},
+			"createdAt": {
+				"title": "Oprettet (dato)",
+				"placeholder": "Vælg datoer"
+			},
+			"deleteAction": "Slet"
+		}
 	}
 }

@@ -13,29 +13,29 @@ import z from 'zod'
 
 export function signInValidation(t: TFunc) {
 	return z.object({
-		email: z.email({ error: t('validations.email') }),
+		email: z.email({ error: t('email') }),
 		password: z
-			.string({ error: t('validations.required') })
-			.min(8, { error: t('validations.min', { number: 8 }) }),
+			.string({ error: t('required') })
+			.min(8, { error: t('min', { number: 8 }) }),
 	})
 }
 export type SignInInput = z.infer<ReturnType<typeof signInValidation>>
 
 export function signUpValidation(t: TFunc) {
 	return z.object({
-		organizationName: z.string({ error: t('validations.required') }),
-		name: z.string({ error: t('validations.required') }),
-		email: z.email({ error: t('validations.email') }),
+		organizationName: z.string({ error: t('required') }),
+		name: z.string({ error: t('required') }),
+		email: z.email({ error: t('email') }),
 		password: z
-			.string({ error: t('validations.required') })
-			.min(8, { error: t('validations.min', { number: 8 }) }),
+			.string({ error: t('required') })
+			.min(8, { error: t('min', { number: 8 }) }),
 	})
 }
 export type SignUpInput = z.infer<ReturnType<typeof signUpValidation>>
 
 export function verifyValidation(t: TFunc) {
 	return z.object({
-		token: z.string({ error: t('validations.required') }),
+		token: z.string({ error: t('required') }),
 	})
 }
 export type verifyInput = z.infer<ReturnType<typeof verifyValidation>>
@@ -60,8 +60,8 @@ export type ListUsersFilters = Awaited<ReturnType<typeof loadUsersSearchParams>>
 
 export function updateUserRoleValidation(t: TFunc) {
 	return z.object({
-		ids: z.array(z.string({ error: t('validations.required') })).min(1),
-		role: z.enum(Role, { error: t('validations.invalid') }),
+		ids: z.array(z.string({ error: t('required') })).min(1),
+		role: z.enum(Role, { error: t('invalid') }),
 	})
 }
 export type UpdateUserRoleInput = z.infer<
@@ -70,7 +70,7 @@ export type UpdateUserRoleInput = z.infer<
 
 export function deleteUserValidation(t: TFunc) {
 	return z.object({
-		ids: z.array(z.string({ error: t('validations.required') })),
+		ids: z.array(z.string({ error: t('required') })),
 	})
 }
 export type DeleteUserInput = z.infer<ReturnType<typeof deleteUserValidation>>
@@ -80,34 +80,32 @@ export function inviteUsersValidation(t: TFunc) {
 		invitations: z
 			.array(
 				z.object({
-					email: z.email({ error: t('validations.email') }),
+					email: z.email({ error: t('email') }),
 				}),
 			)
 			.min(1)
 			.max(10),
-		expiresInDays: z
-			.transform(Number)
-			.pipe(z.number({ error: t('validations.invalid') })),
-		role: z.enum(Role, { error: t('validations.enum') }),
+		expiresInDays: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+		role: z.enum(Role, { error: t('enum') }),
 	})
 }
 export type InviteUsersInput = z.infer<ReturnType<typeof inviteUsersValidation>>
 
 export function acceptAndRegisterValidation(t: TFunc) {
 	return z.object({
-		token: z.string({ error: t('validations.required') }),
-		name: z.string({ error: t('validations.required') }),
-		email: z.email({ error: t('validations.email') }),
+		token: z.string({ error: t('required') }),
+		name: z.string({ error: t('required') }),
+		email: z.email({ error: t('email') }),
 		password: z
-			.string({ error: t('validations.required') })
-			.min(8, { error: t('validations.min', { number: 8 }) }),
+			.string({ error: t('required') })
+			.min(8, { error: t('min', { number: 8 }) }),
 	})
 }
 
 export function updateUserStatusValidation(t: TFunc) {
 	return z.object({
-		ids: z.array(z.string({ error: t('validations.required') })).min(1),
-		active: z.coerce.boolean({ error: t('validations.boolean') }),
+		ids: z.array(z.string({ error: t('required') })).min(1),
+		active: z.coerce.boolean({ error: t('boolean') }),
 	})
 }
 export type UpdateUserStatusInput = z.infer<

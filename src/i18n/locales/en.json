@@ -19,6 +19,72 @@
 		"title": "Hello world!"
 	},
 	"usersPage": {
-		"title": "Users"
+		"title": "Users",
+		"inviteUsersDialog": {
+			"title": "Invite users",
+			"description": "Users will receive an email with a registration link",
+			"expiryOptionOne": "1 day",
+			"expiryOptionTwo": "3 days",
+			"expiryOptionThree": "7 days",
+			"cancelButton": "Close",
+			"confirmButton": "Invite",
+			"expiryLabel": "Expiry period",
+			"roleLabel": "Role",
+			"emailLabel": "Email",
+			"emailPlaceholder": "User's email...",
+			"emailRemoveButton": "Remove email",
+			"emailAddButton": "Add email",
+			"errorToast": "Something went wrong sending invitations",
+			"successToast": "{count, plural, =1 {1 user} other {# users}} invited"
+		},
+		"deleteUsersDialog": {
+			"title": "Do you want to delete {count, plural, =1 {the user} other {# users}}",
+			"description": "This action is permanent and cannot be undone",
+			"cancelButton": "Close",
+			"confirmButton": "Delete",
+			"errorToast": "Something went wrong with the deletion",
+			"successToast": "{count, plural, =1 {1 user} other {# users}} deleted"
+		},
+		"usersTable": {
+			"selectAll": "Select all users",
+			"selectOne": "Select user",
+			"name": {
+				"title": "Name",
+				"placeholder": "Search by name..."
+			},
+			"email": {
+				"title": "Email",
+				"placeholder": "Search by email..."
+			},
+			"role": {
+				"title": "Role",
+				"placeholder": "Select role",
+				"loadingPromise": "Changing role for {name}",
+				"successPromise": "Changed role for {name}",
+				"errorPromise": "Could not change role for {name}"
+			},
+			"emailVerified": {
+				"title": "Verified",
+				"placeholder": "Select a status",
+				"optionOne": "Verified",
+				"optionTwo": "Not verified"
+			},
+			"active": {
+				"title": "Status",
+				"placeholder": "Select a status",
+				"optionOne": "Active",
+				"optionTwo": "Inactive",
+				"loadingPromise": "Changing status for {name}",
+				"successPromise": "Changed status for {name}",
+				"errorPromise": "Could not change status for {name}",
+				"promiseOptionOne": "Activate",
+				"promiseOptionTwo": "Deactivate"
+			},
+			"createdAt": {
+				"title": "Created (date)",
+				"placeholder": "Select dates"
+			},
+			"deleteAction": "Delete"
+		}
 	}
 }

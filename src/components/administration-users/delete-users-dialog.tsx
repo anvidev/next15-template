@@ -28,17 +28,19 @@ import { useAction } from "next-safe-action/hooks";
 import { deleteUsersAction } from "@/actions/auth";
 import { toast } from "sonner";
 import { Loader } from "../common/loader";
+import { useTranslations } from "next-intl";
 
 export function DeleteUsersDialog() {
-	const [rows, setRows] = useState<Row<User>[]>([])
 	const isMobile = useIsMobile();
+	const [rows, setRows] = useState<Row<User>[]>([])
+	const tUsersPage = useTranslations("usersPage")
 
 	const { execute, isExecuting } = useAction(deleteUsersAction, {
 		onError() {
-			toast("Could not delete user")
+			toast(tUsersPage("deleteUsersDialog.errorToast"))
 		},
-		onSuccess(args) {
-			toast(`User${args.input.ids.length > 1 ? 's' : ''} deleted`)
+		onSuccess({ input }) {
+			toast(tUsersPage("deleteUsersDialog.successToast", { count: input.ids.length }))
 			setRows([])
 		},
 	})
@@ -60,14 +62,14 @@ export function DeleteUsersDialog() {
 		<Drawer open={rows.length > 0} onOpenChange={onOpenChange}>
 			<DrawerContent>
 				<DrawerHeader>
-					<DrawerTitle>Are you absolutely sure?</DrawerTitle>
+					<DrawerTitle>{tUsersPage("deleteUsersDialog.title", { count: rows.length })}</DrawerTitle>
 					<DrawerDescription>
-						This action cannot be undone. This will permanently delete your{" "}
+						{tUsersPage("deleteUsersDialog.description")}
 					</DrawerDescription>
 				</DrawerHeader>
 				<DrawerFooter className="gap-2 sm:space-x-0">
 					<DrawerClose asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant="outline">{tUsersPage("deleteUsersDialog.cancelButton")}</Button>
 					</DrawerClose>
 					<Button
 						aria-label="Delete selected rows"
@@ -77,7 +79,7 @@ export function DeleteUsersDialog() {
 						{isExecuting && (
 							<Loader />
 						)}
-						Delete
+						{tUsersPage("deleteUsersDialog.confirmButton")}
 					</Button>
 				</DrawerFooter>
 			</DrawerContent>
@@ -88,14 +90,14 @@ export function DeleteUsersDialog() {
 		<Dialog open={rows.length > 0} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Are you absolutely sure?</DialogTitle>
+					<DialogTitle>{tUsersPage("deleteUsersDialog.title", { count: rows.length })}</DialogTitle>
 					<DialogDescription>
-						This action cannot be undone. This will permanently delete your{" "}
+						{tUsersPage("deleteUsersDialog.description")}
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter className="gap-2 sm:space-x-0">
 					<DialogClose asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant="outline">{tUsersPage("deleteUsersDialog.cancelButton")}</Button>
 					</DialogClose>
 					<Button
 						aria-label="Delete selected rows"
@@ -105,7 +107,7 @@ export function DeleteUsersDialog() {
 						{isExecuting && (
 							<Loader />
 						)}
-						Delete
+						{tUsersPage("deleteUsersDialog.confirmButton")}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

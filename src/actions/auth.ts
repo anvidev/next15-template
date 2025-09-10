@@ -18,7 +18,7 @@ import { flattenValidationErrors } from 'next-safe-action'
 import { revalidatePath } from 'next/cache'
 
 async function getSignUpSchema() {
-	return getServerSchema(signUpValidation)
+	return getServerSchema(signUpValidation, 'validations')
 }
 
 export const signUpAction = publicAction
@@ -32,7 +32,7 @@ export const signUpAction = publicAction
 	})
 
 async function getSignInSchema() {
-	return await getServerSchema(signInValidation)
+	return await getServerSchema(signInValidation, 'validations')
 }
 
 export const signInAction = publicAction
@@ -51,7 +51,7 @@ export const signInAction = publicAction
 	})
 
 async function getVerifySchema() {
-	return await getServerSchema(verifyValidation)
+	return await getServerSchema(verifyValidation, 'valiadations')
 }
 
 export const verifyAction = publicAction
@@ -68,7 +68,7 @@ export const verifyAction = publicAction
 	})
 
 async function getUpdateRoleSchema() {
-	return await getServerSchema(updateUserRoleValidation)
+	return await getServerSchema(updateUserRoleValidation, 'validations')
 }
 
 export const updateRoleAction = adminAction
@@ -85,7 +85,7 @@ export const updateRoleAction = adminAction
 	})
 
 async function getDeleteUserSchema() {
-	return await getServerSchema(deleteUserValidation)
+	return await getServerSchema(deleteUserValidation, 'validations')
 }
 
 export const deleteUsersAction = adminAction
@@ -102,7 +102,7 @@ export const deleteUsersAction = adminAction
 	})
 
 async function getInviteUsersSchema() {
-	return await getServerSchema(inviteUsersValidation)
+	return await getServerSchema(inviteUsersValidation, 'validations')
 }
 
 export const inviteUsersAction = adminAction
@@ -128,7 +128,7 @@ export const inviteUsersAction = adminAction
 	})
 
 async function getAcceptInviteSchema() {
-	return await getServerSchema(acceptAndRegisterValidation)
+	return await getServerSchema(acceptAndRegisterValidation, 'validations')
 }
 
 export const acceptInviteAction = publicAction
@@ -150,7 +150,7 @@ export const acceptInviteAction = publicAction
 	})
 
 async function getUpdateStatusSchema() {
-	return await getServerSchema(updateUserStatusValidation)
+	return await getServerSchema(updateUserStatusValidation, 'validations')
 }
 
 export const updateStatusAction = adminAction

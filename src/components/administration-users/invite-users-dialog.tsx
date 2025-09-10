@@ -40,26 +40,27 @@ import { toast } from "sonner"
 import { Loader } from "../common/loader"
 
 export function InviteUsersDialog() {
-	const t = useTranslations()
 	const isMobile = useIsMobile()
-	const inviteSchema = inviteUsersValidation(t)
 	const [open, setOpen] = useState(false)
+	const tUsersPage = useTranslations("usersPage")
+	const tValidations = useTranslations("validations")
+	const inviteSchema = inviteUsersValidation(tValidations)
 
 	const { execute, isExecuting } = useAction(inviteUsersAction, {
-		onError({ error }) {
-			toast(error.serverError)
+		onError() {
+			toast(tUsersPage("inviteUsersDialog.errorToast"))
 		},
-		onSuccess() {
-			toast("Success!!")
+		onSuccess({ input }) {
+			toast(tUsersPage("inviteUsersDialog.successToast", { count: input.invitations.length }))
 			form.reset()
 			setOpen(false)
 		},
 	})
 
 	const expiresDurations = [
-		{ label: '1 day', expiresIn: 1 },
-		{ label: '3 days', expiresIn: 3 },
-		{ label: '7 days', expiresIn: 7 },
+		{ label: tUsersPage("inviteUsersDialog.expiryOptionOne"), expiresIn: 1 },
+		{ label: tUsersPage("inviteUsersDialog.expiryOptionTwo"), expiresIn: 3 },
+		{ label: tUsersPage("inviteUsersDialog.expiryOptionThree"), expiresIn: 7 },
 	]
 
 	const form = useForm<z.infer<typeof inviteSchema>>({
@@ -85,9 +86,11 @@ export function InviteUsersDialog() {
 			</DrawerTrigger>
 			<DrawerContent>
 				<DrawerHeader>
-					<DrawerTitle>Invite users</DrawerTitle>
+					<DrawerTitle>
+						{tUsersPage("inviteUsersDialog.title")}
+					</DrawerTitle>
 					<DrawerDescription>
-						Users will receive a mail with an invitation and registration link
+						{tUsersPage("inviteUsersDialog.description")}
 					</DrawerDescription>
 				</DrawerHeader>
 				<div className="py-4">
@@ -99,12 +102,17 @@ export function InviteUsersDialog() {
 				</div>
 				<DrawerFooter className="gap-2 sm:space-x-0">
 					<DrawerClose asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant="outline">
+							{tUsersPage("inviteUsersDialog.cancelButton")}
+						</Button>
 					</DrawerClose>
 					<Button
 						aria-label="Delete selected rows"
 					>
-						Invite
+						{isExecuting && (
+							<Loader />
+						)}
+						{tUsersPage("inviteUsersDialog.confirmButton")}
 					</Button>
 				</DrawerFooter>
 			</DrawerContent>
@@ -123,9 +131,11 @@ export function InviteUsersDialog() {
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Invite users</DialogTitle>
+					<DialogTitle>
+						{tUsersPage("inviteUsersDialog.title")}
+					</DialogTitle>
 					<DialogDescription>
-						Users will receive a mail with an invitation and registration link
+						{tUsersPage("inviteUsersDialog.description")}
 					</DialogDescription>
 				</DialogHeader>
 				<div className="py-4">
@@ -137,7 +147,9 @@ export function InviteUsersDialog() {
 				</div>
 				<DialogFooter className="gap-2 sm:space-x-0">
 					<DialogClose asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant="outline">
+							{tUsersPage("inviteUsersDialog.cancelButton")}
+						</Button>
 					</DialogClose>
 					<Button
 						type="submit"
@@ -147,7 +159,7 @@ export function InviteUsersDialog() {
 						{isExecuting && (
 							<Loader />
 						)}
-						Invite
+						{tUsersPage("inviteUsersDialog.confirmButton")}
 					</Button>
 				</DialogFooter>
 			</DialogContent>
@@ -166,7 +178,7 @@ function InviteForm({
 	execute: (input: z.infer<ReturnType<typeof inviteUsersValidation>>) => void
 	isExecuting: boolean
 }) {
-
+	const tUsersPage = useTranslations("usersPage")
 	const { fields, append, remove } = useFieldArray({
 		name: "invitations",
 		control: form.control,
@@ -184,11 +196,11 @@ function InviteForm({
 						name="expiresInDays"
 						render={({ field }) => (
 							<FormItem className="w-1/2">
-								<FormLabel>Expiry</FormLabel>
+								<FormLabel>{tUsersPage("inviteUsersDialog.expiryLabel")}</FormLabel>
 								<Select onValueChange={field.onChange} defaultValue={field.value.toString()}>
 									<FormControl>
 										<SelectTrigger className="w-full">
-											<SelectValue placeholder="Select an expiry" />
+											<SelectValue />
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
@@ -206,11 +218,11 @@ function InviteForm({
 						name="role"
 						render={({ field }) => (
 							<FormItem className="w-1/2">
-								<FormLabel>Role</FormLabel>
+								<FormLabel>{tUsersPage("inviteUsersDialog.roleLabel")}</FormLabel>
 								<Select onValueChange={field.onChange} defaultValue={field.value}>
 									<FormControl>
 										<SelectTrigger className="w-full">
-											<SelectValue placeholder="Select a role" />
+											<SelectValue />
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
@@ -232,10 +244,10 @@ function InviteForm({
 							name={`invitations.${index}.email`}
 							render={({ field }) => (
 								<FormItem className="grow">
-									<FormLabel className={cn(index !== 0 && 'sr-only')}>Email</FormLabel>
+									<FormLabel className={cn(index !== 0 && 'sr-only')}>{tUsersPage("inviteUsersDialog.emailLabel")}</FormLabel>
 									<FormControl>
 										<div className="flex items-center gap-2">
-											<Input placeholder="Email of user..." {...field} />
+											<Input placeholder={tUsersPage("inviteUsersDialog.emailPlaceholder")} {...field} />
 											<Button
 												type="button"
 												variant='outline'
@@ -244,7 +256,7 @@ function InviteForm({
 												className={cn(index === 0 && "self-end")}
 												onClick={() => remove(index)}>
 												<Icons.cross />
-												<p className="sr-only">Remove email</p>
+												<p className="sr-only">{tUsersPage("inviteUsersDialog.emailRemoveButton")}</p>
 											</Button>
 										</div>
 									</FormControl>
@@ -258,7 +270,7 @@ function InviteForm({
 					type="button"
 					variant="secondary"
 					onClick={() => append({ email: "" })}
-					disabled={fields.length >= 10 || isExecuting}>Add email</Button>
+					disabled={fields.length >= 10 || isExecuting}>{tUsersPage("inviteUsersDialog.emailAddButton")}</Button>
 			</form>
 		</Form>
 	)

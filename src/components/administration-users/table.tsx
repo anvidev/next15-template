@@ -25,13 +25,13 @@ import {
 import { Button } from "../ui/button"
 import { toast } from "sonner"
 import { formatDate, getInitials, sleep } from "@/lib/utils"
-import { DataTableRowAction } from "@/lib/date-table/types"
 import { Badge } from "../ui/badge"
 import { DataTableDynamicToolbar } from "../data-table/data-table-dynamic-toolbar"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { updateRoleAction, updateStatusAction } from "@/actions/auth"
 import { Loader } from "../common/loader"
 import { emitCustomEvent } from "react-custom-events"
+import { useTranslations } from "next-intl"
 
 interface Props {
 	user: User
@@ -40,6 +40,7 @@ interface Props {
 
 export function Table({ promise, user }: Props) {
 	const { users, pageCount } = React.use(promise)
+	const t = useTranslations("usersPage")
 
 	const columns = createColumns<User>(c => [
 		c.display({
@@ -51,7 +52,7 @@ export function Table({ promise, user }: Props) {
 						(table.getIsSomePageRowsSelected() && "indeterminate")
 					}
 					onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-					aria-label="Select all"
+					aria-label={t("usersTable.selectAll")}
 					className="translate-y-0.5"
 				/>
 			),
@@ -59,7 +60,7 @@ export function Table({ promise, user }: Props) {
 				<Checkbox
 					checked={row.getIsSelected()}
 					onCheckedChange={(value) => row.toggleSelected(!!value)}
-					aria-label="Select row"
+					aria-label={t("usersTable.selectOne")}
 					className="translate-y-0.5"
 				/>
 			),
@@ -69,7 +70,7 @@ export function Table({ promise, user }: Props) {
 		c.accessor('name', {
 			id: 'name',
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Name" />
+				<DataTableColumnHeader column={column} title={t("usersTable.name.title")} />
 			),
 			cell: ({ row }) => (
 				<div className="flex items-center gap-2">
@@ -84,8 +85,8 @@ export function Table({ promise, user }: Props) {
 				</div>
 			),
 			meta: {
-				label: "Name",
-				placeholder: "Search names...",
+				label: t("usersTable.name.title"),
+				placeholder: t("usersTable.name.placeholder"),
 				variant: "text",
 				icon: Icons.type,
 			},
@@ -94,11 +95,11 @@ export function Table({ promise, user }: Props) {
 		c.accessor('email', {
 			id: 'email',
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Email" />
+				<DataTableColumnHeader column={column} title={t("usersTable.email.title")} />
 			),
 			meta: {
-				label: "Email",
-				placeholder: "Search email...",
+				label: t("usersTable.email.title"),
+				placeholder: t("usersTable.email.placeholder"),
 				variant: "text",
 				icon: Icons.type,
 			},
@@ -107,14 +108,14 @@ export function Table({ promise, user }: Props) {
 		c.accessor('role', {
 			id: 'role',
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Role" />
+				<DataTableColumnHeader column={column} title={t("usersTable.role.title")} />
 			),
 			cell: ({ getValue }) => getValue().charAt(0).toUpperCase() + getValue().slice(1),
 			meta: {
-				label: 'Role',
+				label: t("usersTable.role.title"),
+				placeholder: t("usersTable.role.placeholder"),
 				icon: Icons.list,
 				variant: 'multiSelect',
-				placeholder: 'Choose roles',
 				options: roles.map(r => ({
 					label: r.charAt(0).toUpperCase() + r.slice(1),
 					value: r,
@@ -125,23 +126,28 @@ export function Table({ promise, user }: Props) {
 		c.accessor('emailVerified', {
 			id: "emailVerified",
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Verified" />
+				<DataTableColumnHeader column={column} title={t("usersTable.emailVerified.title")} />
 			),
 			cell: ({ cell }) => {
 				const emailVerifed = cell.row.original.emailVerified
 				return (
 					<Badge variant="outline" className="py-1 [&>svg]:size-3.5">
 						{emailVerifed ? <Icons.check className="text-success" /> : <Icons.cross className="text-destructive" />}
-						<span className="capitalize">{emailVerifed ? 'Verified' : 'Not verified'}</span>
+						<span className="capitalize">
+							{emailVerifed
+								? t("usersTable.emailVerified.optionOne")
+								: t("usersTable.emailVerified.optionTwo")}
+						</span>
 					</Badge>
 				);
 			},
 			meta: {
-				label: "Verified",
+				label: t("usersTable.emailVerified.title"),
+				placeholder: t("usersTable.emailVerified.placeholder"),
 				variant: "select",
 				options: [
-					{ label: 'Verified', value: String(true), icon: Icons.check },
-					{ label: 'Not verified', value: String(false), icon: Icons.cross },
+					{ label: t("usersTable.emailVerified.optionOne"), value: String(true), icon: Icons.check },
+					{ label: t("usersTable.emailVerified.optionTwo"), value: String(false), icon: Icons.cross },
 				],
 				icon: Icons.list,
 			},
@@ -150,23 +156,28 @@ export function Table({ promise, user }: Props) {
 		c.accessor('active', {
 			id: "active",
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Status" />
+				<DataTableColumnHeader column={column} title={t("usersTable.active.title")} />
 			),
 			cell: ({ cell }) => {
 				const active = cell.row.original.active
 				return (
 					<Badge variant="outline" className="py-1 [&>svg]:size-3.5">
 						{active ? <Icons.check className="text-success" /> : <Icons.cross className="text-destructive" />}
-						<span className="capitalize">{active ? 'Activated' : 'Deactivated'}</span>
+						<span className="capitalize">
+							{active
+								? t("usersTable.active.optionOne")
+								: t("usersTable.active.optionTwo")}
+						</span>
 					</Badge>
 				);
 			},
 			meta: {
-				label: "Status",
+				label: t("usersTable.active.title"),
+				placeholder: t("usersTable.active.placeholder"),
 				variant: "select",
 				options: [
-					{ label: 'Activated', value: String(true), icon: Icons.check },
-					{ label: 'Deactivated', value: String(false), icon: Icons.cross },
+					{ label: t("usersTable.active.optionOne"), value: String(true), icon: Icons.check },
+					{ label: t("usersTable.active.optionTwo"), value: String(false), icon: Icons.cross },
 				],
 				icon: Icons.list,
 			},
@@ -175,14 +186,14 @@ export function Table({ promise, user }: Props) {
 		c.accessor('createdAt', {
 			id: 'createdAt',
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Created" />
+				<DataTableColumnHeader column={column} title={t("usersTable.createdAt.title")} />
 			),
 			cell: ({ getValue }) => formatDate(getValue()),
 			meta: {
-				label: 'Created',
+				label: t("usersTable.createdAt.title"),
+				placeholder: t("usersTable.createdAt.placeholder"),
 				icon: Icons.calendar,
 				variant: 'dateRange',
-				placeholder: 'Choose dates',
 			},
 			enableColumnFilter: true,
 		}),
@@ -212,18 +223,19 @@ export function Table({ promise, user }: Props) {
 								Edit
 							</DropdownMenuItem>
 							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>Roles</DropdownMenuSubTrigger>
+								<DropdownMenuSubTrigger>{t("usersTable.role.title")}</DropdownMenuSubTrigger>
 								<DropdownMenuSubContent>
 									<DropdownMenuRadioGroup
 										value={row.original.role}
 										onValueChange={(value) => {
 											startUpdateTransition(() => {
+												const { original } = row
 												toast.promise(
 													updateRoleAction({ ids: [row.original.id], role: value as Role }),
 													{
-														loading: `Change role for ${row.original.name}`,
-														success: `Role changed for ${row.original.name}`,
-														error: `Could not change role for ${row.original.name}`
+														loading: t("usersTable.role.loadingPromise", { name: original.name }),
+														success: t("usersTable.role.successPromise", { name: original.name }),
+														error: t("usersTable.role.errorPromise", { name: original.name })
 													},
 												);
 											});
@@ -243,18 +255,19 @@ export function Table({ promise, user }: Props) {
 								</DropdownMenuSubContent>
 							</DropdownMenuSub>
 							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>Status</DropdownMenuSubTrigger>
+								<DropdownMenuSubTrigger>{t("usersTable.active.title")}</DropdownMenuSubTrigger>
 								<DropdownMenuSubContent>
 									<DropdownMenuRadioGroup
 										value={row.original.active.toString()}
 										onValueChange={(value) => {
 											startUpdateTransition(() => {
+												const { original } = row
 												toast.promise(
 													updateStatusAction({ ids: [row.original.id], active: value === "true" }),
 													{
-														loading: `Change status for ${row.original.name}`,
-														success: `Status changed for ${row.original.name}`,
-														error: `Could not change status for ${row.original.name}`
+														loading: t("usersTable.active.loadingPromise", { name: original.name }),
+														success: t("usersTable.active.successPromise", { name: original.name }),
+														error: t("usersTable.active.errorPromise", { name: original.name })
 													},
 												);
 											});
@@ -265,14 +278,14 @@ export function Table({ promise, user }: Props) {
 											className="capitalize"
 											disabled={pending}
 										>
-											Activate
+											{t("usersTable.active.promiseOptionOne")}
 										</DropdownMenuRadioItem>
 										<DropdownMenuRadioItem
 											value="false"
 											className="capitalize"
 											disabled={pending}
 										>
-											Deactivate
+											{t("usersTable.active.promiseOptionTwo")}
 										</DropdownMenuRadioItem>
 									</DropdownMenuRadioGroup>
 								</DropdownMenuSubContent>
@@ -281,7 +294,7 @@ export function Table({ promise, user }: Props) {
 							<DropdownMenuItem
 								onSelect={() => emitCustomEvent('delete-users-dialog', [row])}
 							>
-								Delete
+								{t("usersTable.deleteAction")}
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

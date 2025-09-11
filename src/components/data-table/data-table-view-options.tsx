@@ -18,6 +18,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface DataTableViewOptionsProps<TData> {
 	table: Table<TData>;
@@ -26,6 +27,7 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({
 	table,
 }: DataTableViewOptionsProps<TData>) {
+	const t = useTranslations("data-table")
 	const columns = React.useMemo(
 		() =>
 			table
@@ -48,7 +50,7 @@ export function DataTableViewOptions<TData>({
 					className="ml-auto hidden h-8 lg:flex"
 				>
 					<Settings2 className="size-3.5" />
-					<span className="text-xs">View</span>
+					<span className="text-sm">{t("viewColumns")}</span>
 					<ChevronsUpDown className="ml-auto opacity-50 size-3.5" />
 				</Button>
 			</PopoverTrigger>

@@ -1,4 +1,17 @@
 {
+	"data-table": {
+		"selectedRows": "{count} of {total} rows selected",
+		"rowsPerPage": "Rows per page",
+		"pageOfPage": "Page {currentPage} of {totalPages}",
+		"resetFilters": "Reset",
+		"addFilter": "Add filter",
+		"exportData": "Export",
+		"viewColumns": "View",
+		"selectedCount": "{count} selected"
+	},
+	"errors": {
+		"unauthorized": "Adgang nægtet"
+	},
 	"sidebar": {
 		"home": "Home",
 		"administration": "Administration",
@@ -81,7 +94,7 @@
 				"promiseOptionTwo": "Deactivate"
 			},
 			"createdAt": {
-				"title": "Created (date)",
+				"title": "Created",
 				"placeholder": "Select dates"
 			},
 			"deleteAction": "Delete"

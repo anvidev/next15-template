@@ -1,7 +1,6 @@
 "use client";
 
 import type { Table } from "@tanstack/react-table";
-import { Loader, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -13,6 +12,9 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Loader } from "../common/loader";
+import { useTranslations } from "next-intl";
+import { Icons } from "../common/icons";
 
 interface DataTableActionBarProps<TData>
 	extends React.ComponentProps<typeof motion.div> {
@@ -131,6 +133,7 @@ interface DataTableActionBarSelectionProps<TData> {
 function DataTableActionBarSelection<TData>({
 	table,
 }: DataTableActionBarSelectionProps<TData>) {
+	const t = useTranslations("data-table")
 	const onClearSelection = React.useCallback(() => {
 		table.toggleAllRowsSelected(false);
 	}, [table]);
@@ -138,7 +141,7 @@ function DataTableActionBarSelection<TData>({
 	return (
 		<div className="flex h-7 items-center rounded-md border pr-1 pl-2.5">
 			<span className="whitespace-nowrap text-xs">
-				{table.getFilteredSelectedRowModel().rows.length} selected
+				{t("selectedCount", { count: table.getFilteredSelectedRowModel().rows.length })}
 			</span>
 			<Separator
 				orientation="vertical"
@@ -152,7 +155,7 @@ function DataTableActionBarSelection<TData>({
 						className="size-5"
 						onClick={onClearSelection}
 					>
-						<X className="size-3.5" />
+						<Icons.cross className="size-3.5" />
 					</Button>
 				</TooltipTrigger>
 				<TooltipContent

@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Icons } from "../common/icons";
 import { DataTableExportData } from "./data-table-export-data";
+import { useTranslations } from "next-intl";
 
 interface DataTableDynamicToolbarProps<TData> extends React.ComponentProps<"div"> {
 	table: Table<TData>;
@@ -40,6 +41,7 @@ export function DataTableDynamicToolbar<TData>({
 	className,
 	...props
 }: DataTableDynamicToolbarProps<TData>) {
+	const t = useTranslations("data-table")
 	const [visibleFilters, setVisibleFilters] = React.useState(new Set(table.getState().columnFilters.map(cf => cf.id)))
 
 	const isFiltered = table.getState().columnFilters.length > 0 || table.getState().globalFilter;
@@ -57,6 +59,7 @@ export function DataTableDynamicToolbar<TData>({
 
 	// TODO: implement removal of filters
 	function removeFilter(columnId: string) {
+		columns.find(c => c.id === columnId)?.setFilterValue(undefined)
 		setVisibleFilters(prev => {
 			prev.delete(columnId)
 			return new Set(prev)
@@ -84,7 +87,15 @@ export function DataTableDynamicToolbar<TData>({
 				)}
 
 				{visibleColums.map((column) => (
-					<DataTableToolbarFilter key={column.id} column={column} />
+					<div key={column.id} className="relative group">
+						<div
+							onClick={() => removeFilter(column.id)}
+							className="group-hover:opacity-100 hover:bg-foreground/80 pointer-events-none group-hover:pointer-events-auto opacity-0 transition-all absolute animate-in -translate-y-1/3 right-0 translate-x-1/3 rounded-sm bg-foreground text-background p-0.5">
+							<Icons.cross
+								className="size-3 stroke-3" />
+						</div>
+						<DataTableToolbarFilter key={column.id} column={column} />
+					</div>
 				))}
 				{visibleFilters.size < columns.length && (
 					<AddFilterButton
@@ -96,11 +107,11 @@ export function DataTableDynamicToolbar<TData>({
 						aria-label="Reset filters"
 						variant="outline"
 						size="sm"
-						className="border-dashed"
+						className="border-dashed text-sm"
 						onClick={onReset}
 					>
-						<X />
-						Reset
+						<Icons.cross />
+						{t("resetFilters")}
 					</Button>
 				)}
 			</div>
@@ -258,6 +269,7 @@ interface DataTableDynamicToolbarAddFilterProps<TData> {
 }
 
 function AddFilterButton<TData>({ onAdd, columns }: DataTableDynamicToolbarAddFilterProps<TData>) {
+	const t = useTranslations("data-table")
 	const [open, setOpen] = React.useState(false)
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -265,10 +277,10 @@ function AddFilterButton<TData>({ onAdd, columns }: DataTableDynamicToolbarAddFi
 				<Button
 					variant="outline"
 					size="sm"
-					className="border-dashed text-xs"
+					className="border-dashed text-sm"
 				>
 					<Icons.plus className="size-3.5" />
-					Add filter
+					{t("addFilter")}
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-[200px] p-0">

@@ -151,7 +151,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 													: "opacity-50 [&_svg]:invisible",
 											)}
 										>
-											<Check className="size-3.5" />
+											<Check className="size-3.5 text-primary-foreground" />
 										</div>
 										{option.icon && <option.icon className="size-3.5" />}
 										<span className="truncate">{option.label}</span>
@@ -172,7 +172,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 										onSelect={() => onReset()}
 										className="justify-center text-center"
 									>
-										Clear filters
+										Clear filter
 									</CommandItem>
 								</CommandGroup>
 							</>

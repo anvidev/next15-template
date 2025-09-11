@@ -1,4 +1,14 @@
 {
+	"data-table": {
+		"selectedRows": "{count} af {total} rækker valgt",
+		"rowsPerPage": "Rækker pr. side",
+		"pageOfPage": "Side {currentPage} af {totalPages}",
+		"resetFilters": "Nulstil",
+		"addFilter": "Tilføj filter",
+		"exportData": "Eksporter",
+		"viewColumns": "Vis",
+		"selectedCount": "{count} valgt"
+	},
 	"errors": {
 		"unauthorized": "Adgang nægtet"
 	},
@@ -84,7 +94,7 @@
 				"promiseOptionTwo": "Deaktiver"
 			},
 			"createdAt": {
-				"title": "Oprettet (dato)",
+				"title": "Oprettet",
 				"placeholder": "Vælg datoer"
 			},
 			"deleteAction": "Slet"

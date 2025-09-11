@@ -1,7 +1,6 @@
 "use client";
 
 import type { Column, Table } from "@tanstack/react-table";
-import { X } from "lucide-react";
 import * as React from "react";
 
 import { DataTableDateFilter } from "@/components/data-table/data-table-date-filter";
@@ -12,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Icons } from "../common/icons";
+import { useTranslations } from "next-intl";
 
 interface DataTableToolbarProps<TData> extends React.ComponentProps<"div"> {
 	table: Table<TData>;
@@ -23,6 +23,7 @@ export function DataTableToolbar<TData>({
 	className,
 	...props
 }: DataTableToolbarProps<TData>) {
+	const t = useTranslations("data-table")
 	const isFiltered = table.getState().columnFilters.length > 0 || table.getState().globalFilter;
 
 	const columns = table.getAllColumns().filter((column) => column.getCanFilter())
@@ -55,11 +56,11 @@ export function DataTableToolbar<TData>({
 						aria-label="Reset filters"
 						variant="outline"
 						size="sm"
-						className="border-dashed"
+						className="border-dashed text-xs"
 						onClick={onReset}
 					>
-						<X />
-						Reset
+						<Icons.cross />
+						{t("resetFilters")}
 					</Button>
 				)}
 			</div>

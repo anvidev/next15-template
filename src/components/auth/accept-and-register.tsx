@@ -25,8 +25,8 @@ interface Props {
 export function AcceptAndRegister({ promise }: Props) {
 	const { success, data: invitation } = React.use(promise)
 	const router = useRouter()
-	const t = useTranslations()
-	const acceptAndInviteSchema = acceptAndRegisterValidation(t)
+	const tValidations = useTranslations("validations")
+	const acceptAndInviteSchema = acceptAndRegisterValidation(tValidations)
 	const { execute, isExecuting } = useAction(acceptInviteAction, {
 		onError({ error }) {
 			toast(error.serverError)

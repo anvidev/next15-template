@@ -31,8 +31,8 @@ import { signInValidation } from '@/schemas/auth'
 
 export function SignInForm() {
 	const router = useRouter()
-	const t = useTranslations()
-	const signInSchema = signInValidation(t)
+	const tValidations = useTranslations("validations")
+	const signInSchema = signInValidation(tValidations)
 	const { execute, isExecuting } = useAction(signInAction, {
 		onError({ error }) {
 			toast(error.serverError)
@@ -73,7 +73,7 @@ export function SignInForm() {
 								<FormItem>
 									<FormLabel>Email</FormLabel>
 									<FormControl>
-										<Input placeholder='Your email...' {...field} />
+										<Input type="email" autoComplete='email webauthn' placeholder='Your email...' {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -86,7 +86,7 @@ export function SignInForm() {
 								<FormItem>
 									<FormLabel>Password</FormLabel>
 									<FormControl>
-										<Input type='password' {...field} />
+										<Input type='password' autoComplete='current-password webauthn' {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>

@@ -31,8 +31,8 @@ import z from 'zod'
 
 export function SignUpForm() {
 	const router = useRouter()
-	const t = useTranslations('validation')
-	const signUpSchema = signUpValidation(t)
+	const tValidations = useTranslations('validations')
+	const signUpSchema = signUpValidation(tValidations)
 	const { execute, isExecuting } = useAction(signUpAction, {
 		onError(args) {
 			if (args.error.serverError) {

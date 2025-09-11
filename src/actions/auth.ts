@@ -51,7 +51,7 @@ export const signInAction = publicAction
 	})
 
 async function getVerifySchema() {
-	return await getServerSchema(verifyValidation, 'valiadations')
+	return await getServerSchema(verifyValidation, 'validations')
 }
 
 export const verifyAction = publicAction

@@ -20,16 +20,17 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from '@/components/ui/sidebar'
-import { usePathname, useRouter } from '@/i18n/navigation'
+import { Link, usePathname, useRouter } from '@/i18n/navigation'
 import { Locale } from '@/i18n/routing'
 import { cn, getInitials } from '@/lib/utils'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 import { Icons } from '@/components/common/icons'
 import { useAuth } from '@/components/providers/auth'
 
 export function User() {
+	const t = useTranslations("sidebar")
 	const { setTheme, resolvedTheme } = useTheme()
 	const { isMobile } = useSidebar()
 	const router = useRouter()
@@ -106,12 +107,12 @@ export function User() {
 							<DropdownMenuSub>
 								<DropdownMenuSubTrigger>
 									<Icons.eclipse />
-									Theme
+									{t("userMenu.theme")}
 								</DropdownMenuSubTrigger>
 								<DropdownMenuPortal>
 									<DropdownMenuSubContent>
 										<DropdownMenuItem onClick={() => setTheme('light')}>
-											Light
+											{t("userMenu.themeOption", { theme: 'light' })}
 											<Icons.check
 												className={cn(
 													'hidden ml-auto',
@@ -120,7 +121,7 @@ export function User() {
 											/>
 										</DropdownMenuItem>
 										<DropdownMenuItem onClick={() => setTheme('dark')}>
-											Dark
+											{t("userMenu.themeOption", { theme: 'dark' })}
 											<Icons.check
 												className={cn(
 													'hidden ml-auto',
@@ -134,12 +135,12 @@ export function User() {
 							<DropdownMenuSub>
 								<DropdownMenuSubTrigger>
 									<Icons.languages />
-									Languages
+									{t("userMenu.language")}
 								</DropdownMenuSubTrigger>
 								<DropdownMenuPortal>
 									<DropdownMenuSubContent>
 										<DropdownMenuItem onClick={() => switchLocale('en')}>
-											English
+											{t("userMenu.languageOption", { lang: 'en' })}
 											<Icons.check
 												className={cn(
 													'hidden ml-auto',
@@ -148,7 +149,7 @@ export function User() {
 											/>
 										</DropdownMenuItem>
 										<DropdownMenuItem onClick={() => switchLocale('da')}>
-											Danish
+											{t("userMenu.languageOption", { lang: 'da' })}
 											<Icons.check
 												className={cn(
 													'hidden ml-auto',
@@ -162,19 +163,21 @@ export function User() {
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<Icons.user />
-								Account
+							<DropdownMenuItem asChild>
+								<Link href="/account">
+									<Icons.user />
+									{t("userMenu.account")}
+								</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem>
 								<Icons.help />
-								Support
+								{t("userMenu.support")}
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={signOutHandler}>
 							<Icons.logout />
-							Log out
+							{t("userMenu.signOut")}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

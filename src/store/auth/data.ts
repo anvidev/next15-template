@@ -97,6 +97,15 @@ export const authStore = {
 			)
 		return rows.at(0)
 	},
+	listAccounts: async function (
+		id: User['id'],
+		tx: Tx = db,
+	): Promise<Account[]> {
+		return await tx
+			.select()
+			.from(accountsTable)
+			.where(eq(accountsTable.userId, id))
+	},
 	getUserById: async function (
 		id: string,
 		tx: Tx = db,

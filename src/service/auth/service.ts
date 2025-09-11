@@ -440,4 +440,19 @@ export const authService = {
 
 		return { invitation, user }
 	},
+	listAccountUses: async function (
+		id: User['id'],
+	): Promise<Record<AccountProvider, boolean>> {
+		const accounts = await authStore.listAccounts(id)
+		const usage: Record<AccountProvider, boolean> = {
+			credential: false,
+			pin: false,
+		}
+
+		for (const account of accounts) {
+			usage[account.provider] = true
+		}
+
+		return usage
+	},
 }

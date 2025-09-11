@@ -1,7 +1,6 @@
 "use client";
 
 import type { Column, Table } from "@tanstack/react-table";
-import { X } from "lucide-react";
 import * as React from "react";
 import {
 	Command,
@@ -57,7 +56,6 @@ export function DataTableDynamicToolbar<TData>({
 		})
 	}
 
-	// TODO: implement removal of filters
 	function removeFilter(columnId: string) {
 		columns.find(c => c.id === columnId)?.setFilterValue(undefined)
 		setVisibleFilters(prev => {

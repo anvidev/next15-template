@@ -17,7 +17,16 @@
 		"administration": "Administration",
 		"users": "Users",
 		"organization": "Organization",
-		"billing": "Billing"
+		"billing": "Billing",
+		"userMenu": {
+			"theme": "Theme",
+			"themeOption": "{theme, select, light {Light} dark {Dark} other {Unknown}}",
+			"language": "Language",
+			"languageOption": "{lang, select, da {Danish} en {English} other {Unknown}}",
+			"account": "Account",
+			"support": "Support",
+			"signOut": "Sign out"
+		}
 	},
 	"validations": {
 		"required": "Field is required",
@@ -99,5 +108,8 @@
 			},
 			"deleteAction": "Delete"
 		}
+	},
+	"accountPage": {
+		"title": "Account"
 	}
 }

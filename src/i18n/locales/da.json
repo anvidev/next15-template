@@ -17,7 +17,16 @@
 		"administration": "Administration",
 		"users": "Brugere",
 		"organization": "Organisation",
-		"billing": "Betaling"
+		"billing": "Betaling",
+		"userMenu": {
+			"theme": "Tema",
+			"themeOption": "{theme, select, light {Lyst} dark {Mørkt} other {Ukendt}}",
+			"language": "Sprog",
+			"languageOption": "{lang, select, da {Dansk} en {Engelsk} other {Ukendt}}",
+			"account": "Profil",
+			"support": "Få hjælp",
+			"signOut": "Log ud"
+		}
 	},
 	"validations": {
 		"required": "Felt er påkrævet",
@@ -99,5 +108,8 @@
 			},
 			"deleteAction": "Slet"
 		}
+	},
+	"accountPage": {
+		"title": "Profil"
 	}
 }

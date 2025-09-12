@@ -32,6 +32,7 @@ import { updateRoleAction, updateStatusAction } from "@/actions/auth"
 import { Loader } from "../common/loader"
 import { emitCustomEvent } from "react-custom-events"
 import { useTranslations } from "next-intl"
+import { DataTableSkeleton } from "../data-table/data-table-skeleton"
 
 interface Props {
 	user: User

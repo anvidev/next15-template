@@ -3,9 +3,19 @@
 import { authService } from "@/service/auth/service"
 import { Icons } from "../common/icons"
 import { Button } from "../ui/button"
-import { use } from "react"
+import { use, useState } from "react"
 import { Input } from "../ui/input"
 import { AccountAccordion } from "./accordion"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp"
+import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { useAction } from "next-safe-action/hooks"
+import { createPinAction, deleteOwnUserAction, resetAccountProviderAction } from "@/actions/auth"
+import { toast } from "sonner"
+import { useTranslations } from "next-intl"
+import { Loader } from "../common/loader"
+import { useRouter } from "@/i18n/navigation"
+import { VerificationType } from "@/store/auth/models"
+import { Skeleton } from "../ui/skeleton"
 
 interface Props {
 	promise: Promise<Awaited<ReturnType<typeof authService.listAccountUses>>>
@@ -20,7 +30,7 @@ export function Actions({ promise }: Props) {
 				<p className="text-muted-foreground font-medium text-sm">Sikkerhed</p>
 				<div className="w-full space-y-1 border p-1 shadow-sm bg-card rounded-lg">
 					<EmailAccordion />
-					<CredentialsAccordions active={accountUsage.credential} />
+					<PasswordAccordions active={accountUsage.credential} />
 					<PinAccordions active={accountUsage.pin} />
 				</div>
 			</div>
@@ -35,23 +45,59 @@ export function Actions({ promise }: Props) {
 }
 
 function EmailAccordion() {
+	const { execute, isExecuting } = useAction(resetAccountProviderAction, {
+		onError({ error }) {
+			if (error.serverError) {
+				toast(error.serverError)
+			} else {
+				toast("unknownError")
+			}
+		},
+		onSuccess() {
+			toast("successToast")
+		},
+	})
+
 	return (
 		<AccountAccordion
 			title="Skift email"
-			description="Få tilsendt et link"
+			description="Modtag et link til at ændre email"
 			icon={<Icons.email className="size-4 text-card-foreground" />}>
-			<p>Hello</p>
+			<p className="text-sm text-muted-foreground">Du får tilsendt en mail med et link, hvor du kan ændre din email.</p>
+			<p className="text-sm text-muted-foreground">Linket er gyldigt i 1 time.</p>
+			<Button disabled={isExecuting} onClick={() => execute({ type: VerificationType.Email })}>
+				{isExecuting && <Loader />}
+				Send link
+			</Button>
 		</AccountAccordion>
 	)
 }
 
-function CredentialsAccordions({ active }: { active: boolean }) {
+function PasswordAccordions({ active }: { active: boolean }) {
+	const { execute: resetPassword, isExecuting: isResetingPassword } = useAction(resetAccountProviderAction, {
+		onError({ error }) {
+			if (error.serverError) {
+				toast(error.serverError)
+			} else {
+				toast("unknownError")
+			}
+		},
+		onSuccess() {
+			toast("successToast")
+		},
+	})
+
 	return active ? (
 		<AccountAccordion
-			title="Skift kodeord"
-			description="Få tilsendt et link"
+			title="Skift adgangskode"
+			description="Modtag et link til at ændre adgangskode"
 			icon={<Icons.password className="size-4 text-card-foreground" />}>
-			<p>Hello</p>
+			<p className="text-sm text-muted-foreground">Du får tilsendt en mail med et link, hvor du kan ændre din adgangskode.</p>
+			<p className="text-sm text-muted-foreground">Linket er gyldigt i 1 time.</p>
+			<Button disabled={isResetingPassword} onClick={() => resetPassword({ type: VerificationType.Password })}>
+				{isResetingPassword && <Loader />}
+				Send link
+			</Button>
 		</AccountAccordion>
 	) : (
 		<AccountAccordion
@@ -64,38 +110,142 @@ function CredentialsAccordions({ active }: { active: boolean }) {
 }
 
 function PinAccordions({ active }: { active: boolean }) {
+	const t = useTranslations()
+	const [pin, setPin] = useState("")
+
+	const { execute: resetPin, isExecuting: isResetingPin } = useAction(resetAccountProviderAction, {
+		onError({ error }) {
+			if (error.serverError) {
+				toast(error.serverError)
+			} else {
+				toast("unknownError")
+			}
+		},
+		onSuccess() {
+			toast("successToast")
+		},
+	})
+
+	const { execute: createPin, isExecuting: isCreatingPin } = useAction(createPinAction, {
+		onError({ error }) {
+			if (error.serverError) {
+				toast(error.serverError)
+			} else if (error.validationErrors) {
+				toast(error.validationErrors.pin)
+			} else {
+				toast("unknownError")
+			}
+		},
+		onSuccess() {
+			toast("successToast")
+			setPin('')
+		},
+	})
+
 	return active ? (
 		<AccountAccordion
-			title="Skift PIN kode"
-			description="Få tilsendt et link"
+			title="Skift PIN-kode"
+			description="Modtag et link til at ændre PIN-kode"
 			icon={<Icons.pin className="size-4 text-card-foreground" />}>
-			<p>Hello</p>
+			<p className="text-sm text-muted-foreground">Du får tilsendt en mail med et link, hvor du kan ændre din PIN-kode.</p>
+			<p className="text-sm text-muted-foreground">Linket er gyldigt i 1 time.</p>
+			<Button disabled={isResetingPin} onClick={() => resetPin({ type: VerificationType.PIN })}>
+				{isResetingPin && <Loader />}
+				Send link
+			</Button>
 		</AccountAccordion>
 	) : (
 		<AccountAccordion
-			title="Opret PIN kode"
-			description="Indtast en 4-cifret kode"
+			onOpenChange={() => setPin("")}
+			title="Opret PIN-kode"
+			description="Vælg en 4-cifret kode"
 			icon={<Icons.pin className="size-4 text-card-foreground" />}>
-			<p>Hello</p>
+			<p className="text-sm text-muted-foreground">PIN-koden bruges til at logge ind i mobilappen.</p>
+
+			<div className="flex items-center gap-2">
+				<InputOTP
+					pattern={REGEXP_ONLY_DIGITS}
+					inputMode="numeric"
+					maxLength={4}
+					minLength={4}
+					value={pin}
+					disabled={isCreatingPin}
+					onChange={(value) => setPin(value)}
+				>
+					<InputOTPGroup>
+						<InputOTPSlot index={0} />
+						<InputOTPSlot index={1} />
+						<InputOTPSlot index={2} />
+						<InputOTPSlot index={3} />
+					</InputOTPGroup>
+				</InputOTP>
+				<Button
+					disabled={pin.length !== 4 || isCreatingPin}
+					onClick={() => createPin({ pin })}>
+					{isCreatingPin && <Loader />}
+					Opret
+				</Button>
+			</div>
 		</AccountAccordion>
 	)
 }
 
 function DangerAccordions() {
+	const router = useRouter()
+	const [value, setValue] = useState("")
+
+	const { execute, isExecuting } = useAction(deleteOwnUserAction, {
+		onError({ error }) {
+			if (error.serverError) {
+				toast(error.serverError)
+			} else {
+				toast("unknownError")
+			}
+		},
+		onSuccess() {
+			toast("Konto slettet")
+			router.replace("/sign-in")
+		},
+	})
+
 	return (
-
 		<AccountAccordion
-			title="Slet bruger"
-			description="Slet min data fra systemet"
+			title="Slet konto"
+			description="Fjern al din data permanent"
 			icon={<Icons.trash className="size-4 text-card-foreground" />}>
-			<p className="text-sm text-muted-foreground">Denne handling er permanent og kan ikke gøres om.</p>
+			<p className="text-sm text-muted-foreground">Denne handling er permanent og kan ikke fortrydes.</p>
 
-			<p className="text-sm text-muted-foreground">Bekræft ved at skrive <strong>"Slet bruger"</strong> for at slette din bruger</p>
+			<p className="text-sm text-muted-foreground">Bekræft ved at skrive <strong>"Slet konto"</strong> for at slette din konto.</p>
 
 			<div className="flex items-center gap-2">
-				<Input />
-				<Button variant="destructive">Slet</Button>
+				<Input disabled={isExecuting} value={value} onChange={e => setValue(e.target.value)} />
+				<Button
+					variant="destructive"
+					disabled={value.toLowerCase() !== "slet konto" || isExecuting}
+					onClick={() => execute()}>
+					{isExecuting && <Loader />}
+					Slet
+				</Button>
 			</div>
 		</AccountAccordion>
+	)
+}
+
+export function ActionsSkeleton() {
+	return (
+		<>
+			<div className="space-y-3">
+				<Skeleton className="h-5 w-16" />
+				<div className="w-full space-y-1 border p-1 shadow-sm bg-card rounded-lg">
+					<Skeleton className="w-full h-52" />
+				</div>
+			</div>
+			<div className="space-y-3">
+				<Skeleton className="h-5 w-16" />
+				<div className="w-full space-y-1 border p-1 shadow-sm bg-card rounded-lg">
+					<Skeleton className="w-full h-20" />
+				</div>
+			</div>
+		</>
 	)
 }

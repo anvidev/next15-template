@@ -3,6 +3,7 @@ import { InviteUsersDialog } from '@/components/administration-users/invite-user
 import { Table } from '@/components/administration-users/table'
 import { Page } from '@/components/common/page'
 import { withAuth, WithAuthProps } from '@/components/common/with-auth'
+import { DataTableSkeleton } from '@/components/data-table/data-table-skeleton'
 import { loadUsersSearchParams } from '@/schemas/auth'
 import { authService } from '@/service/auth/service'
 import { SearchParams } from 'nuqs'
@@ -25,7 +26,7 @@ async function UsersPage({ t, tenant, user, searchParams }: Props) {
 			</Page.Header>
 			<Page.Content>
 				<main className='grow relative'>
-					<Suspense fallback={<p>Loading users...</p>}>
+					<Suspense fallback={<DataTableSkeleton />}>
 						<Table user={user} promise={users} />
 					</Suspense>
 					<DeleteUsersDialog />

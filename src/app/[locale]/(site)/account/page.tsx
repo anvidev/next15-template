@@ -1,6 +1,5 @@
-import { Actions } from '@/components/account/actions'
+import { Actions, ActionsSkeleton } from '@/components/account/actions'
 import { Display } from '@/components/account/display'
-import { Loader } from '@/components/common/loader'
 import { Page } from '@/components/common/page'
 import { withAuth, WithAuthProps } from '@/components/common/with-auth'
 import { authService } from '@/service/auth/service'
@@ -17,7 +16,7 @@ async function AccountPage({ user, t }: WithAuthProps) {
 			<Page.Content>
 				<main className='grow max-w-xl mx-auto w-full space-y-8'>
 					<Display user={user} />
-					<Suspense fallback={<Loader />}>
+					<Suspense fallback={<ActionsSkeleton />}>
 						<Actions promise={accountUsagePromise} />
 					</Suspense>
 				</main>

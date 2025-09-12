@@ -6,6 +6,7 @@ import { generateRandomString, slugify } from '@/lib/utils'
 import { ListUsersFilters, SignInInput, SignUpInput } from '@/schemas/auth'
 import { authStore } from '@/store/auth/data'
 import {
+	Account,
 	AccountProvider,
 	Invitation,
 	InvitationStatus,
@@ -19,7 +20,7 @@ import {
 } from '@/store/auth/models'
 import bcrypt from 'bcrypt'
 import { randomBytes } from 'crypto'
-import { addDays, isWithinInterval, subDays } from 'date-fns'
+import { addDays, addHours, isWithinInterval, subDays } from 'date-fns'
 import { cookies } from 'next/headers'
 import { env } from 'process'
 import { cache } from 'react'
@@ -303,6 +304,19 @@ export const authService = {
 	confirmVerification: async function (token: string): Promise<Verification> {
 		return authStore.updateVerification(token, { verifiedAt: new Date() })
 	},
+	createVerification: async function (
+		userId: User['id'],
+		type: VerificationType,
+		durationInHours: number = 1,
+	): Promise<Verification> {
+		return await authStore.createVerification({
+			id: generateRandomString(32, 'verification_'),
+			expiresAt: addHours(new Date(), durationInHours),
+			token: generateRandomString(32),
+			userId,
+			type,
+		})
+	},
 	listUsers: async function (
 		tenantId: Tenant['id'],
 		filters: ListUsersFilters,
@@ -454,5 +468,18 @@ export const authService = {
 		}
 
 		return usage
+	},
+	createPin: async function (
+		userId: User['id'],
+		pin: number,
+	): Promise<Account> {
+		const passwordHash = await bcrypt.hash(pin.toString(), 12)
+		const account = await authStore.createAccount({
+			id: generateRandomString(32, 'account_'),
+			provider: AccountProvider.PIN,
+			userId: userId,
+			pinHash: passwordHash,
+		})
+		return account
 	},
 }

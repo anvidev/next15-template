@@ -1,6 +1,6 @@
 import { TFunc } from '@/i18n/types'
 import { getSortingStateParser } from '@/lib/date-table/parsers'
-import { Role, rolesSchema, User } from '@/store/auth/models'
+import { Role, rolesSchema, User, VerificationType } from '@/store/auth/models'
 import {
 	createLoader,
 	parseAsArrayOf,
@@ -110,4 +110,22 @@ export function updateUserStatusValidation(t: TFunc) {
 }
 export type UpdateUserStatusInput = z.infer<
 	ReturnType<typeof updateUserStatusValidation>
+>
+
+export function createPinValidation(t: TFunc) {
+	return z.object({
+		pin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+	})
+}
+
+export type CreatePinInput = z.infer<ReturnType<typeof createPinValidation>>
+
+export function createVerificationValidation(t: TFunc) {
+	return z.object({
+		type: z.enum(VerificationType, { error: t('enum') }),
+	})
+}
+
+export type CreateVerificationInput = z.infer<
+	ReturnType<typeof createVerificationValidation>
 >

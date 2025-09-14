@@ -1,6 +1,7 @@
 import {
 	AccountProvider,
 	InvitationStatus,
+	ResetRequestType,
 	Role,
 	SessionPlatform,
 	VerificationType,
@@ -109,4 +110,18 @@ export const accountsTable = sqliteTable('accounts', {
 	provider: text('provider').$type<AccountProvider>().notNull(),
 	passwordHash: text('password_hash'),
 	pinHash: text('pin_hash'),
+})
+
+export const resetRequestsTable = sqliteTable('reset_requests', {
+	id: text('id').primaryKey(),
+	userId: text('user_id')
+		.references(() => usersTable.id, { onDelete: 'cascade' })
+		.notNull(),
+	type: text('type').$type<ResetRequestType>().notNull(),
+	token: text('token').unique().notNull(),
+	expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+	createdAt: integer('created_at', { mode: 'timestamp' })
+		.$defaultFn(() => new Date())
+		.notNull(),
+	consumedAt: integer('consumed_at', { mode: 'timestamp' }),
 })

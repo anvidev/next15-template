@@ -62,7 +62,7 @@ function EmailAccordion() {
 		<AccountAccordion
 			title="Skift email"
 			description="Modtag et link til at ændre email"
-			icon={<Icons.email className="size-4 text-card-foreground" />}>
+			leftIcon={Icons.email}>
 			<p className="text-sm text-muted-foreground">Du får tilsendt en mail med et link, hvor du kan ændre din email.</p>
 			<p className="text-sm text-muted-foreground">Linket er gyldigt i 1 time.</p>
 			<Button disabled={isExecuting} onClick={() => execute({ type: VerificationType.Email })}>
@@ -91,7 +91,7 @@ function PasswordAccordions({ active }: { active: boolean }) {
 		<AccountAccordion
 			title="Skift adgangskode"
 			description="Modtag et link til at ændre adgangskode"
-			icon={<Icons.password className="size-4 text-card-foreground" />}>
+			leftIcon={Icons.password}>
 			<p className="text-sm text-muted-foreground">Du får tilsendt en mail med et link, hvor du kan ændre din adgangskode.</p>
 			<p className="text-sm text-muted-foreground">Linket er gyldigt i 1 time.</p>
 			<Button disabled={isResetingPassword} onClick={() => resetPassword({ type: VerificationType.Password })}>
@@ -103,7 +103,7 @@ function PasswordAccordions({ active }: { active: boolean }) {
 		<AccountAccordion
 			title="Opret kodeord"
 			description="Indtast en kode på minimum 8 karaterer"
-			icon={<Icons.password className="size-4 text-card-foreground" />}>
+			leftIcon={Icons.password}>
 			<p>Hello</p>
 		</AccountAccordion>
 	)
@@ -146,7 +146,7 @@ function PinAccordions({ active }: { active: boolean }) {
 		<AccountAccordion
 			title="Skift PIN-kode"
 			description="Modtag et link til at ændre PIN-kode"
-			icon={<Icons.pin className="size-4 text-card-foreground" />}>
+			leftIcon={Icons.pin}>
 			<p className="text-sm text-muted-foreground">Du får tilsendt en mail med et link, hvor du kan ændre din PIN-kode.</p>
 			<p className="text-sm text-muted-foreground">Linket er gyldigt i 1 time.</p>
 			<Button disabled={isResetingPin} onClick={() => resetPin({ type: VerificationType.PIN })}>
@@ -159,7 +159,7 @@ function PinAccordions({ active }: { active: boolean }) {
 			onOpenChange={() => setPin("")}
 			title="Opret PIN-kode"
 			description="Vælg en 4-cifret kode"
-			icon={<Icons.pin className="size-4 text-card-foreground" />}>
+			leftIcon={Icons.pin}>
 			<p className="text-sm text-muted-foreground">PIN-koden bruges til at logge ind i mobilappen.</p>
 
 			<div className="flex items-center gap-2">
@@ -212,10 +212,10 @@ function DangerAccordions() {
 		<AccountAccordion
 			title="Slet konto"
 			description="Fjern al din data permanent"
-			icon={<Icons.trash className="size-4 text-card-foreground" />}>
+			leftIcon={Icons.trash}>
 			<p className="text-sm text-muted-foreground">Denne handling er permanent og kan ikke fortrydes.</p>
 
-			<p className="text-sm text-muted-foreground">Bekræft ved at skrive <strong>"Slet konto"</strong> for at slette din konto.</p>
+			<p className="text-sm text-muted-foreground">Bekræft ved at skrive <strong>&quot;Slet konto&quot;</strong> for at slette din konto.</p>
 
 			<div className="flex items-center gap-2">
 				<Input disabled={isExecuting} value={value} onChange={e => setValue(e.target.value)} />

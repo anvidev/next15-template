@@ -97,6 +97,23 @@ export const authStore = {
 			)
 		return rows.at(0)
 	},
+	updateAccount: async function (
+		id: User['id'],
+		provider: AccountProvider,
+		input: Partial<Pick<Account, 'passwordHash' | 'pinHash'>>,
+		tx: Tx = db,
+	): Promise<Account> {
+		const [account] = await tx
+			.update(accountsTable)
+			.set({
+				...input,
+			})
+			.where(
+				and(eq(accountsTable.userId, id), eq(accountsTable.provider, provider)),
+			)
+			.returning()
+		return account
+	},
 	listAccounts: async function (
 		id: User['id'],
 		tx: Tx = db,

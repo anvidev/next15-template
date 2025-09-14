@@ -9,8 +9,10 @@ import {
 	createVerificationValidation,
 	deleteUserValidation,
 	inviteUsersValidation,
+	resetPinValidation,
 	signInValidation,
 	signUpValidation,
+	updateProfileValidation,
 	updateUserRoleValidation,
 	updateUserStatusValidation,
 	verifyValidation,
@@ -61,7 +63,10 @@ async function getVerifySchema() {
 
 export const verifyAction = publicAction
 	.metadata({ actionName: 'verifyAction' })
-	.inputSchema(getVerifySchema)
+	.inputSchema(getVerifySchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
 	.action(async ({ parsedInput }) => {
 		const { token } = parsedInput
 		const verification = await authService.confirmVerification(token)
@@ -78,7 +83,10 @@ async function getUpdateRoleSchema() {
 
 export const updateRoleAction = adminAction
 	.metadata({ actionName: 'updateRoleAction' })
-	.inputSchema(getUpdateRoleSchema)
+	.inputSchema(getUpdateRoleSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
 	.action(async ({ parsedInput, ctx }) => {
 		const { user, tenant, locale } = ctx
 		const { ids, role } = parsedInput
@@ -95,7 +103,10 @@ async function getDeleteUserSchema() {
 
 export const deleteUsersAction = adminAction
 	.metadata({ actionName: 'deleteUsersAction' })
-	.inputSchema(getDeleteUserSchema)
+	.inputSchema(getDeleteUserSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
 	.action(async ({ parsedInput, ctx }) => {
 		const { tenant, user, locale } = ctx
 		const { ids } = parsedInput
@@ -112,7 +123,10 @@ async function getInviteUsersSchema() {
 
 export const inviteUsersAction = adminAction
 	.metadata({ actionName: 'inviteUsersAction' })
-	.inputSchema(getInviteUsersSchema)
+	.inputSchema(getInviteUsersSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
 	.action(async ({ parsedInput, ctx }) => {
 		const { tenant, user, locale } = ctx
 		const { invitations, expiresInDays, role } = parsedInput
@@ -138,7 +152,10 @@ async function getAcceptInviteSchema() {
 
 export const acceptInviteAction = publicAction
 	.metadata({ actionName: 'acceptInviteAction' })
-	.inputSchema(getAcceptInviteSchema)
+	.inputSchema(getAcceptInviteSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
 	.action(async ({ parsedInput }) => {
 		const { token, name, email, password } = parsedInput
 		const { user } = await authService.acceptInvitation(
@@ -160,7 +177,10 @@ async function getUpdateStatusSchema() {
 
 export const updateStatusAction = adminAction
 	.metadata({ actionName: 'updateStatusAction' })
-	.inputSchema(getUpdateStatusSchema)
+	.inputSchema(getUpdateStatusSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
 	.action(async ({ parsedInput, ctx }) => {
 		const { user, tenant, locale } = ctx
 		const { ids, active } = parsedInput
@@ -201,7 +221,10 @@ async function getCreateVerificationSchema() {
 
 export const resetAccountProviderAction = authedAction
 	.metadata({ actionName: 'resetAccountProviderAction' })
-	.inputSchema(getCreateVerificationSchema)
+	.inputSchema(getCreateVerificationSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
 	.action(async ({ parsedInput, ctx }) => {
 		const { type } = parsedInput
 		const { user } = ctx
@@ -215,4 +238,35 @@ export const resetAccountProviderAction = authedAction
 				type,
 			}),
 		)
+	})
+
+async function getUpdateOwnProfileSchema() {
+	return await getServerSchema(updateProfileValidation, 'validations')
+}
+
+export const updateOwnProfileAction = authedAction
+	.metadata({ actionName: 'updateOwnProfileAction' })
+	.inputSchema(getUpdateOwnProfileSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput, ctx }) => {
+		const { name, image } = parsedInput
+		const { user, tenant, locale } = ctx
+		await authService.updateUserProfile(user.id, tenant.id, {
+			name,
+			image: image == '' ? null : image,
+		})
+		revalidatePath(`/${locale}/account`)
+	})
+
+async function getResetPinSchema() {
+	return await getServerSchema(resetPinValidation, 'validations')
+}
+
+export const resetPinAction = publicAction
+	.metadata({ actionName: 'resetPinAction' })
+	.inputSchema(getResetPinSchema)
+	.action(async ({ parsedInput }) => {
+		const { token, pin } = parsedInput
 	})

@@ -1,6 +1,7 @@
 import {
 	accountsTable,
 	invitationsTable,
+	resetRequestsTable,
 	sessionsTable,
 	tenantsTable,
 	usersTable,
@@ -37,6 +38,7 @@ export type NewSession = typeof sessionsTable.$inferInsert
 
 export enum VerificationType {
 	Email = 'email',
+	NewEmail = 'new-email',
 	Password = 'password',
 	PIN = 'pin',
 }
@@ -68,3 +70,12 @@ export function hasPermissionByRole(
 
 	return userRank >= requiredRank
 }
+
+export enum ResetRequestType {
+	Password = 'password',
+	PIN = 'pin',
+}
+export const resetRequestTypes = Object.values(ResetRequestType)
+export const resetRequestTypeSchema = z.enum(ResetRequestType)
+export type ResetRequest = typeof resetRequestsTable.$inferSelect
+export type NewResetRequest = typeof resetRequestsTable.$inferInsert

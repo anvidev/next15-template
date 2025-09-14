@@ -96,7 +96,7 @@ export function getInitials(name: string) {
 			initials += parts[i][0]
 		}
 	}
-	return initials
+	return initials.slice(0,2)
 }
 
 export function sleep(ms: number) {

@@ -290,16 +290,10 @@ export const authService = {
 
 		return authStore.deleteSession(token)
 	},
-	getVerification: async function (token: string): Promise<Verification> {
-		const verification = await authStore.getVerification(token)
-		if (!verification) {
-			throw new ApplicationError(
-				'Verification token was not found or has already been used',
-				'Service: Not Found',
-				{ token },
-			)
-		}
-		return verification
+	getVerification: async function (
+		token: string,
+	): Promise<Verification | undefined> {
+		return await authStore.getVerification(token)
 	},
 	confirmVerification: async function (token: string): Promise<Verification> {
 		return authStore.updateVerification(token, { verifiedAt: new Date() })
@@ -347,10 +341,14 @@ export const authService = {
 	): Promise<void> {
 		const deleted = await authStore.deleteUser(id, tenantId)
 		if (!deleted) {
-			throw new ApplicationError('User was not found', 'Service: Not Found', {
-				id,
-				tenantId,
-			})
+			throw new ApplicationError(
+				'User was not found',
+				'Service: Database Error',
+				{
+					id,
+					tenantId,
+				},
+			)
 		}
 	},
 	createInvitation: async function (
@@ -369,6 +367,7 @@ export const authService = {
 			inviterId,
 			role,
 		})
+		// TODO: remove email logic from service function
 		await emailService.sendRecursively(
 			[email],
 			'Invitation to [PROJ_NAME] - [TRANSLATE LATER]',
@@ -379,16 +378,10 @@ export const authService = {
 		)
 		return invitation
 	},
-	getInvitation: async function (token: string): Promise<Invitation> {
-		const invitation = await authStore.getInvitation(token)
-		if (!invitation) {
-			throw new ApplicationError(
-				'Invitation token was not found or has already been used',
-				'Service: Not Found',
-				{ token },
-			)
-		}
-		return invitation
+	getInvitation: async function (
+		token: string,
+	): Promise<Invitation | undefined> {
+		return await authStore.getInvitation(token)
 	},
 	acceptInvitation: async function (
 		token: string,
@@ -481,5 +474,15 @@ export const authService = {
 			pinHash: passwordHash,
 		})
 		return account
+	},
+	updateUserProfile: async function (
+		id: User['id'],
+		tenantId: Tenant['id'],
+		input: Pick<User, 'name' | 'image'>,
+	): Promise<User> {
+		return await authStore.updateUser(id, tenantId, {
+			name: input.name,
+			image: input.image,
+		})
 	},
 }

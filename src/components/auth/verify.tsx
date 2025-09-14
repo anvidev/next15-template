@@ -9,14 +9,13 @@ import { toast } from "sonner";
 import { authService } from "@/service/auth/service";
 import * as React from 'react'
 import { useAction } from "next-safe-action/hooks";
-import { SafeResult } from "@/lib/try-catch";
 
 interface Props {
-	promise: Promise<SafeResult<Awaited<ReturnType<typeof authService.getVerification>>>>
+	promise: Promise<Awaited<ReturnType<typeof authService.getVerification>>>
 }
 
 export function Verify({ promise }: Props) {
-	const { success, data: verification } = React.use(promise)
+	const verification = React.use(promise)
 	const router = useRouter()
 	const { execute, isExecuting } = useAction(verifyAction, {
 		onError({ error }) {
@@ -28,7 +27,7 @@ export function Verify({ promise }: Props) {
 		}
 	})
 
-	if (!success) {
+	if (!verification) {
 		return <VerifyNotFound />
 	}
 

@@ -129,3 +129,23 @@ export function createVerificationValidation(t: TFunc) {
 export type CreateVerificationInput = z.infer<
 	ReturnType<typeof createVerificationValidation>
 >
+
+export function updateProfileValidation(t: TFunc) {
+	return z.object({
+		name: z.string({ error: t('required') }),
+		image: z.union([z.literal(''), z.url()]),
+	})
+}
+
+export type UpdateProfileInput = z.infer<
+	ReturnType<typeof updateProfileValidation>
+>
+
+export function resetPinValidation(t: TFunc) {
+	return z.object({
+		token: z.string({ error: t('required') }),
+		pin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+	})
+}
+
+export type ResetPinInput = z.infer<ReturnType<typeof resetPinValidation>>

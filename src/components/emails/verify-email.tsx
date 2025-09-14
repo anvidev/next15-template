@@ -11,8 +11,8 @@ export function EmailTemplate({ name, token, environment = 'development' }: Emai
 	const verlUrl = env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
 	const port = env.PORT ?? 3000
 	const verifyUrl = environment == 'production'
-		? `https://${verlUrl}/verify/${token}`
-		: `http://localhost:${port}/verify/${token}`
+		? `https://${verlUrl}/verify/email/${token}`
+		: `http://localhost:${port}/verify/email/${token}`
 
 	return (
 		<div>

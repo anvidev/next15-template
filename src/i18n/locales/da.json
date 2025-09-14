@@ -35,7 +35,8 @@
 		"email": "Skal være en gyldig e-mail",
 		"invalid": "Ugyldig værdi",
 		"enum": "Vælg venligst fra listen",
-		"boolean": "Værdi skal være sandt eller falsk"
+		"boolean": "Værdi skal være sandt eller falsk",
+		"url": "Skal være en gyldig url"
 	},
 	"home": {
 		"title": "Hej verden!"

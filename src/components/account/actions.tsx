@@ -8,6 +8,7 @@ import { Input } from "../ui/input"
 import { AccountAccordion } from "./accordion"
 import { useAction } from "next-safe-action/hooks"
 import {
+	changeEmailAction,
 	changeOwnPasswordAction,
 	changeOwnPinAction,
 	createPasswordAction,
@@ -21,6 +22,7 @@ import { Skeleton } from "../ui/skeleton"
 import { useForm } from "react-hook-form"
 import { useTranslations } from "next-intl"
 import {
+	changeEmailValidation,
 	changePasswordValidation,
 	changePinValidation,
 	createPasswordValidation,
@@ -68,6 +70,23 @@ export function Actions({ promise }: Props) {
 
 function EmailAccordion() {
 	const tAccountPage = useTranslations("accountPage")
+	const tValidations = useTranslations('validations')
+	const changeSchema = changeEmailValidation(tValidations)
+
+	const changeForm = useForm<z.infer<typeof changeSchema>>({
+		resolver: zodResolver(changeSchema),
+		defaultValues: { newEmail: "" }
+	})
+
+	const { execute, isExecuting } = useAction(changeEmailAction, {
+		onError(args) {
+			toast("no good")
+		},
+		onSuccess(args) {
+			toast("all good")
+		},
+	})
+
 	return (
 		<AccountAccordion
 			title={tAccountPage("emailAccordion.title")}
@@ -75,6 +94,35 @@ function EmailAccordion() {
 			leftIcon={Icons.email}>
 			<p className="text-sm text-muted-foreground">{tAccountPage("emailAccordion.textOne")}</p>
 			<p className="text-sm text-muted-foreground">{tAccountPage("emailAccordion.textTwo")}</p>
+			<Form {...changeForm}>
+				<form onSubmit={changeForm.handleSubmit(execute)} className="flex flex-col gap-4">
+					<FormField
+						control={changeForm.control}
+						name="newEmail"
+						render={({ field }) => (
+							<FormItem className="w-full">
+								<FormLabel>
+									{tAccountPage("emailAccordion.newEmail")}
+								</FormLabel>
+								<FormControl>
+									<Input
+										disabled={isExecuting}
+										placeholder={tAccountPage("emailAccordion.newEmailPlaceholder")}
+										{...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button
+						className="w-full"
+						disabled={isExecuting}
+						type="submit">
+						{isExecuting && <Loader />}
+						{tAccountPage("emailAccordion.updateButton")}
+					</Button>
+				</form>
+			</Form>
 		</AccountAccordion>
 	)
 }

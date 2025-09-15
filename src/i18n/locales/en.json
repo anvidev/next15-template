@@ -123,7 +123,10 @@
 			"title": "Update Email",
 			"description": "Receive a link to change your email",
 			"textOne": "You will receive an email with a link where you can change your email.",
-			"textTwo": "The link is active for 1 hour."
+			"textTwo": "The link is active for 1 hour.",
+			"newEmail": "New email",
+			"newEmailPlaceholder": "Enter your desired email",
+			"updateButton": "Send"
 		},
 		"passwordAccordion": {
 			"updateTitle": "Update Password",

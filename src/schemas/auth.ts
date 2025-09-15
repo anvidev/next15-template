@@ -260,3 +260,9 @@ export function createPasswordValidation(t: TFunc) {
 			}
 		})
 }
+
+export function changeEmailValidation(t: TFunc) {
+	return z.object({
+		newEmail: z.email({ error: t('email') }),
+	})
+}

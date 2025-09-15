@@ -376,6 +376,7 @@ export const authService = {
 	createVerification: async function (
 		userId: User['id'],
 		type: VerificationType,
+		meta?: Record<string, any>,
 		durationInHours: number = 1,
 	): Promise<Verification> {
 		return await authStore.createVerification({
@@ -384,7 +385,38 @@ export const authService = {
 			token: generateRandomString(32),
 			userId,
 			type,
+			meta,
 		})
+	},
+	createNewEamilVerification: async function (
+		userId: User['id'],
+		newEmail: string,
+		durationInHours: number = 1,
+	): Promise<Verification> {
+		const { verification } = await db.transaction(async tx => {
+			const userExists = await authStore.getUserByEmail(newEmail)
+			if (userExists) {
+				throw (
+					new ApplicationError(
+						'a user with that email already exists',
+						'Service: Conflict',
+						{ userId, newEmail },
+					),
+					tx
+				)
+			}
+			const newEmailVerification = await authStore.createVerification({
+				id: generateRandomString(32, 'verification_'),
+				expiresAt: addHours(new Date(), durationInHours),
+				token: generateRandomString(32),
+				type: VerificationType.NewEmail,
+				userId,
+				meta: { email: newEmail },
+			})
+
+			return { verification: newEmailVerification }
+		})
+		return verification
 	},
 	listUsers: async function (
 		tenantId: Tenant['id'],
@@ -572,5 +604,8 @@ export const authService = {
 			name: input.name,
 			image: input.image,
 		})
+	},
+	getUserByEmail: async function (email: string): Promise<User | undefined> {
+		return await authStore.getUserByEmail(email)
 	},
 }

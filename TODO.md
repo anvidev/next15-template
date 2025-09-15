@@ -12,4 +12,6 @@
  - [x] Create PIN code
  - [ ] Reset PIN code
  - [ ] Reset Password
+ - [x] Change PIN code
+ - [x] Change password
  - [ ] Change email

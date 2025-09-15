@@ -1,9 +1,11 @@
 'use server'
 
+import { VerifyNewEmail } from '@/components/emails/verify-new-email'
 import { adminAction, authedAction, publicAction } from '@/lib/safe-action'
 import { getServerSchema } from '@/lib/validations'
 import {
 	acceptAndRegisterValidation,
+	changeEmailValidation,
 	changePasswordValidation,
 	changePinValidation,
 	createPasswordValidation,
@@ -19,9 +21,11 @@ import {
 	verifyValidation,
 } from '@/schemas/auth'
 import { authService } from '@/service/auth/service'
+import { emailService } from '@/service/emails/emails'
 import { SessionPlatform } from '@/store/auth/models'
 import { flattenValidationErrors } from 'next-safe-action'
 import { revalidatePath } from 'next/cache'
+import { env } from 'process'
 
 async function getSignUpSchema() {
 	return getServerSchema(signUpValidation, 'validations')
@@ -297,4 +301,32 @@ export const createPasswordAction = authedAction
 		const { password } = parsedInput
 		await authService.createPassword(user.id, password)
 		revalidatePath(`/${locale}/account`)
+	})
+
+async function getChangeEmailSchema() {
+	return await getServerSchema(changeEmailValidation, 'validations')
+}
+
+export const changeEmailAction = authedAction
+	.metadata({ actionName: 'changeEmailAction' })
+	.inputSchema(getChangeEmailSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput, ctx }) => {
+		const { newEmail } = parsedInput
+		const { user } = ctx
+		const newEmailVerification = await authService.createNewEamilVerification(
+			user.id,
+			newEmail,
+		)
+		await emailService.sendRecursively(
+			[newEmail],
+			'',
+			VerifyNewEmail({
+				environment: env.NODE_ENV,
+				name: user.name,
+				token: newEmailVerification.token,
+			}),
+		)
 	})

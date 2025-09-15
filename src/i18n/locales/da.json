@@ -123,7 +123,10 @@
 			"title": "Opdater email",
 			"description": "Modtag et link til at ændre email",
 			"textOne": "Du får tilsendt en mail med et link, hvor du kan ændre din email.Du får tilsendt en mail med et link, hvor du kan ændre din email.",
-			"textTwo": "Linket er aktive i 1 time."
+			"textTwo": "Linket er aktive i 1 time.",
+			"newEmail": "Ny email",
+			"newEmailPlaceholder": "Indtast den ønskede email",
+			"updateButton": "Send"
 		},
 		"passwordAccordion": {
 			"updateTitle": "Opdater adgangskode",

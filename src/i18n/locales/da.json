@@ -164,7 +164,6 @@
 			"newPinPlaceholder": "Indtast ny PIN-kode",
 			"confirmPin": "Bekræft PIN-kode",
 			"confirmPinPlaceholder": "Indtast ny PIN-kode igen"
-
 		},
 		"dangerAccordion": {
 			"title": "Slet konto",
@@ -183,5 +182,13 @@
 			"imageDescription": "Indsæt en gyldig billed-URL. Kun jpg, jpeg, png og gif understøttes",
 			"updateButton": "Opdater"
 		}
+	},
+	"resetPage": {
+		"cardTitle": "Opdater {type, select, pin {PIN-kode} password {adgangskode} other {ukendt}}",
+		"cardDescription": "Indtast din nye {type, select, pin {PIN-kode} password {adganskode} other {ukendt}} for at fortsætte",
+		"credential": "{type, select, pin {PIN-kode} password {Adgangskode} other {Ukendt}}",
+		"confirmCredential": "Bekræft {type, select, pin {PIN-kode} password {adgangskode} other {ukendt}}",
+		"updateButton": "Opdater",
+		"notFound": "Link er enten udløbet eller ugyldigt"
 	}
 }

@@ -7,14 +7,12 @@ import {
 	usersTable,
 	verificationsTable,
 } from '@/lib/database/schema/auth'
-import z from 'zod'
 
 export enum AccountProvider {
 	Credential = 'credential',
 	PIN = 'pin',
 }
 export const accountProviders = Object.values(AccountProvider)
-export const accountProvidersScheme = z.enum(AccountProvider)
 export type Account = typeof accountsTable.$inferSelect
 export type NewAccount = typeof accountsTable.$inferInsert
 
@@ -23,7 +21,6 @@ export enum Role {
 	User = 'user',
 }
 export const roles = Object.values(Role)
-export const rolesSchema = z.enum(Role)
 export type User = typeof usersTable.$inferSelect
 export type NewUser = typeof usersTable.$inferInsert
 
@@ -32,18 +29,14 @@ export enum SessionPlatform {
 	App = 'app',
 }
 export const sessionPlatform = Object.values(SessionPlatform)
-export const sessionPlatformSchema = z.enum(SessionPlatform)
 export type Session = typeof sessionsTable.$inferSelect
 export type NewSession = typeof sessionsTable.$inferInsert
 
 export enum VerificationType {
 	Email = 'email',
 	NewEmail = 'new-email',
-	Password = 'password',
-	PIN = 'pin',
 }
 export const verificationTypes = Object.values(VerificationType)
-export const verificationTypesSchema = z.enum(VerificationType)
 export type Verification = typeof verificationsTable.$inferSelect
 export type NewVerification = typeof verificationsTable.$inferInsert
 
@@ -54,7 +47,6 @@ export enum InvitationStatus {
 	Cancelled = 'cancalled',
 }
 export const invitationStatuses = Object.values(InvitationStatus)
-export const invitationStatusesSchema = z.enum(InvitationStatus)
 export type Invitation = typeof invitationsTable.$inferSelect
 export type NewInvitation = typeof invitationsTable.$inferInsert
 
@@ -76,6 +68,5 @@ export enum ResetRequestType {
 	PIN = 'pin',
 }
 export const resetRequestTypes = Object.values(ResetRequestType)
-export const resetRequestTypeSchema = z.enum(ResetRequestType)
 export type ResetRequest = typeof resetRequestsTable.$inferSelect
 export type NewResetRequest = typeof resetRequestsTable.$inferInsert

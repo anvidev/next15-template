@@ -1,19 +1,19 @@
-import { VerificationType } from '@/store/auth/models';
+import { ResetRequestType } from '@/store/auth/models';
 import { env } from 'process';
 import * as React from 'react';
 
 interface EmailTemplateProps {
 	environment: 'development' | 'production' | 'test'
 	token: string
-	type: VerificationType
+	type: ResetRequestType
 }
 
 export function ResetAccountProvider({ type, token, environment = 'development' }: EmailTemplateProps) {
 	const verlUrl = env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
 	const port = env.PORT ?? 3000
 	const resetUrl = environment == 'production'
-		? `https://${verlUrl}/reset/${type}/${token}`
-		: `http://localhost:${port}/reset/${type}/${token}`
+		? `https://${verlUrl}/reset/${token}`
+		: `http://localhost:${port}/reset/${token}`
 
 	return (
 		<div>

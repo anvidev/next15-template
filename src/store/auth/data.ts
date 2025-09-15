@@ -2,6 +2,7 @@ import { db, Tx } from '@/lib/database/connection'
 import {
 	accountsTable,
 	invitationsTable,
+	resetRequestsTable,
 	sessionsTable,
 	tenantsTable,
 	usersTable,
@@ -28,10 +29,12 @@ import {
 	Invitation,
 	NewAccount,
 	NewInvitation,
+	NewResetRequest,
 	NewSession,
 	NewTenant,
 	NewUser,
 	NewVerification,
+	ResetRequest,
 	Session,
 	Tenant,
 	User,
@@ -344,5 +347,46 @@ export const authStore = {
 			.where(eq(invitationsTable.token, token))
 			.returning()
 		return invitation
+	},
+	//
+
+	createResetRequest: async function (
+		input: NewResetRequest,
+		tx: Tx = db,
+	): Promise<ResetRequest> {
+		const [resetRequest] = await tx
+			.insert(resetRequestsTable)
+			.values(input)
+			.returning()
+		return resetRequest
+	},
+	updateResetRequest: async function (
+		token: ResetRequest['token'],
+		input: Partial<Pick<ResetRequest, 'expiresAt' | 'consumedAt'>>,
+		tx: Tx = db,
+	): Promise<ResetRequest> {
+		const [resetRequest] = await tx
+			.update(resetRequestsTable)
+			.set({
+				...input,
+			})
+			.where(eq(resetRequestsTable.token, token))
+			.returning()
+		return resetRequest
+	},
+	getResetRequest: async function (
+		token: string,
+		tx: Tx = db,
+	): Promise<ResetRequest | undefined> {
+		const rows = await tx
+			.select()
+			.from(resetRequestsTable)
+			.where(
+				and(
+					eq(resetRequestsTable.token, token),
+					isNull(resetRequestsTable.consumedAt),
+				),
+			)
+		return rows.at(0)
 	},
 }

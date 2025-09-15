@@ -65,7 +65,7 @@ export function SignInForm() {
 					<form
 						id='sign-in-form'
 						onSubmit={form.handleSubmit(execute)}
-						className='space-y-4'>
+						className='space-y-5'>
 						<FormField
 							control={form.control}
 							name='email'
@@ -84,7 +84,15 @@ export function SignInForm() {
 							name='password'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Password</FormLabel>
+									<div className='flex items-center'>
+										<FormLabel>Password</FormLabel>
+										<Link
+											href="/forgot"
+											className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+										>
+											Forgot your password?
+										</Link>
+									</div>
 									<FormControl>
 										<Input type='password' autoComplete='current-password webauthn' {...field} />
 									</FormControl>

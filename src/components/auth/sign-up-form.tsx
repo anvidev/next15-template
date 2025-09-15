@@ -72,7 +72,7 @@ export function SignUpForm() {
 					<form
 						id='sign-in-form'
 						onSubmit={form.handleSubmit(execute)}
-						className='space-y-4'>
+						className='space-y-5'>
 						<FormField
 							control={form.control}
 							name='organizationName'

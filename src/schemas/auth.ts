@@ -1,6 +1,6 @@
 import { TFunc } from '@/i18n/types'
 import { getSortingStateParser } from '@/lib/date-table/parsers'
-import { Role, rolesSchema, User } from '@/store/auth/models'
+import { ResetRequestType, Role, User } from '@/store/auth/models'
 import {
 	createLoader,
 	parseAsArrayOf,
@@ -19,9 +19,6 @@ export function signInPasswordValidation(t: TFunc) {
 			.min(8, { error: t('min', { number: 8 }) }),
 	})
 }
-export type SignInPasswordInput = z.infer<
-	ReturnType<typeof signInPasswordValidation>
->
 
 export function signInPinValidation(t: TFunc) {
 	return z.object({
@@ -29,7 +26,6 @@ export function signInPinValidation(t: TFunc) {
 		pin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
 	})
 }
-export type SignInPinInput = z.infer<ReturnType<typeof signInPinValidation>>
 
 export function signUpValidation(t: TFunc) {
 	return z.object({
@@ -48,7 +44,6 @@ export function verifyValidation(t: TFunc) {
 		token: z.string({ error: t('required') }),
 	})
 }
-export type verifyInput = z.infer<ReturnType<typeof verifyValidation>>
 
 export const usersSearchParams = {
 	q: parseAsString.withDefault(''),
@@ -61,7 +56,7 @@ export const usersSearchParams = {
 	email: parseAsString.withDefault(''),
 	emailVerified: parseAsBoolean,
 	active: parseAsBoolean,
-	role: parseAsArrayOf(rolesSchema),
+	role: parseAsArrayOf(z.enum(Role)),
 	createdAt: parseAsArrayOf(parseAsTimestamp),
 }
 
@@ -74,16 +69,12 @@ export function updateUserRoleValidation(t: TFunc) {
 		role: z.enum(Role, { error: t('invalid') }),
 	})
 }
-export type UpdateUserRoleInput = z.infer<
-	ReturnType<typeof updateUserRoleValidation>
->
 
 export function deleteUserValidation(t: TFunc) {
 	return z.object({
 		ids: z.array(z.string({ error: t('required') })),
 	})
 }
-export type DeleteUserInput = z.infer<ReturnType<typeof deleteUserValidation>>
 
 export function inviteUsersValidation(t: TFunc) {
 	return z.object({
@@ -99,7 +90,6 @@ export function inviteUsersValidation(t: TFunc) {
 		role: z.enum(Role, { error: t('enum') }),
 	})
 }
-export type InviteUsersInput = z.infer<ReturnType<typeof inviteUsersValidation>>
 
 export function acceptAndRegisterValidation(t: TFunc) {
 	return z.object({
@@ -118,17 +108,12 @@ export function updateUserStatusValidation(t: TFunc) {
 		active: z.coerce.boolean({ error: t('boolean') }),
 	})
 }
-export type UpdateUserStatusInput = z.infer<
-	ReturnType<typeof updateUserStatusValidation>
->
 
 export function createPinValidation(t: TFunc) {
 	return z.object({
 		pin: z.transform(Number).pipe(z.coerce.number({ error: t('invalid') })),
 	})
 }
-
-export type CreatePinInput = z.infer<ReturnType<typeof createPinValidation>>
 
 export function updateProfileValidation(t: TFunc) {
 	return z.object({
@@ -137,18 +122,12 @@ export function updateProfileValidation(t: TFunc) {
 	})
 }
 
-export type UpdateProfileInput = z.infer<
-	ReturnType<typeof updateProfileValidation>
->
-
 export function resetPinValidation(t: TFunc) {
 	return z.object({
 		token: z.string({ error: t('required') }),
 		pin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
 	})
 }
-
-export type ResetPinInput = z.infer<ReturnType<typeof resetPinValidation>>
 
 export function changePinValidation(t: TFunc) {
 	return z
@@ -201,8 +180,6 @@ export function changePinValidation(t: TFunc) {
 			}
 		})
 }
-
-export type ChangePinInput = z.infer<ReturnType<typeof changePinValidation>>
 
 export function changePasswordValidation(t: TFunc) {
 	return z
@@ -265,4 +242,63 @@ export function changeEmailValidation(t: TFunc) {
 	return z.object({
 		newEmail: z.email({ error: t('email') }),
 	})
+}
+
+export function createResetRequestValidation(t: TFunc) {
+	return z.object({
+		email: z.email({ error: t('email') }),
+		type: z.enum(ResetRequestType, { error: t('enum') }),
+	})
+}
+
+export function sendPinResetRequestValidation(t: TFunc) {
+	return z
+		.object({
+			token: z.string({ error: t('required') }),
+			type: z.enum(ResetRequestType, { error: t('enum') }),
+			credential: z
+				.string({ error: t('required') })
+				.min(4, { error: t('min', { number: 4 }) })
+				.max(4, { error: t('max', { number: 4 }) }),
+			confirmCredential: z
+				.string({ error: t('required') })
+				.min(4, { error: t('min', { number: 4 }) })
+				.max(4, { error: t('max', { number: 4 }) }),
+		})
+		.superRefine((val, ctx) => {
+			if (val.credential !== val.confirmCredential) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('pinMismatch'),
+					input: val,
+					path: ['confirmCredential'],
+				})
+			}
+		})
+}
+
+export function sendPasswordResetRequestValidation(t: TFunc) {
+	return z
+		.object({
+			token: z.string({ error: t('required') }),
+			type: z.enum(ResetRequestType, { error: t('enum') }),
+			credential: z
+				.string({ error: t('required') })
+				.min(8, { error: t('min', { number: 8 }) })
+				.max(32, { error: t('max', { number: 32 }) }),
+			confirmCredential: z
+				.string({ error: t('required') })
+				.min(8, { error: t('min', { number: 8 }) })
+				.max(32, { error: t('max', { number: 32 }) }),
+		})
+		.superRefine((val, ctx) => {
+			if (val.credential !== val.confirmCredential) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('passwordMismatch'),
+					input: val,
+					path: ['confirmCredential'],
+				})
+			}
+		})
 }

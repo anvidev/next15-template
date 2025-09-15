@@ -10,6 +10,8 @@ import {
 	AccountProvider,
 	Invitation,
 	InvitationStatus,
+	ResetRequest,
+	ResetRequestType,
 	Role,
 	Session,
 	SessionPlatform,
@@ -370,7 +372,9 @@ export const authService = {
 	): Promise<Verification | undefined> {
 		return await authStore.getVerification(token)
 	},
-	confirmVerification: async function (token: string): Promise<Verification> {
+	confirmEmailVerification: async function (
+		token: string,
+	): Promise<Verification> {
 		return authStore.updateVerification(token, { verifiedAt: new Date() })
 	},
 	confirmNewEmailVerification: async function (
@@ -415,9 +419,8 @@ export const authService = {
 
 		return verification
 	},
-	createVerification: async function (
+	createEmailVerification: async function (
 		userId: User['id'],
-		type: VerificationType,
 		meta?: Record<string, any>,
 		durationInHours: number = 1,
 	): Promise<Verification> {
@@ -425,8 +428,8 @@ export const authService = {
 			id: generateRandomString(32, 'verification_'),
 			expiresAt: addHours(new Date(), durationInHours),
 			token: generateRandomString(32),
+			type: VerificationType.Email,
 			userId,
-			type,
 			meta,
 		})
 	},
@@ -643,5 +646,77 @@ export const authService = {
 	},
 	getUserByEmail: async function (email: string): Promise<User | undefined> {
 		return await authStore.getUserByEmail(email)
+	},
+	createResetRequest: async function (
+		email: string,
+		type: ResetRequestType,
+		durationInHours: number = 1,
+	): Promise<ResetRequest | undefined> {
+		const { resetRequest } = await db.transaction(async tx => {
+			const user = await authStore.getUserByEmail(email, tx)
+			if (!user) {
+				return { resetRequest: undefined }
+			}
+
+			const resetRequest = await authStore.createResetRequest(
+				{
+					id: generateRandomString(32, 'reset_'),
+					token: generateRandomString(32),
+					userId: user.id,
+					type,
+					expiresAt: addHours(new Date(), durationInHours),
+				},
+				tx,
+			)
+
+			return { resetRequest }
+		})
+
+		return resetRequest
+	},
+	getResetRequest: async function (
+		token: string,
+	): Promise<ResetRequest | undefined> {
+		return await authStore.getResetRequest(token)
+	},
+	consumeResetRequest: async function (
+		token: string,
+		type: ResetRequestType,
+		credential: string,
+	): Promise<ResetRequest> {
+		const { resetRequest } = await db.transaction(async tx => {
+			const updatedResetRequest = await authStore.updateResetRequest(
+				token,
+				{
+					consumedAt: new Date(),
+				},
+				tx,
+			)
+
+			let accountProvider: AccountProvider
+
+			switch (type) {
+				case ResetRequestType.Password:
+					accountProvider = AccountProvider.Credential
+					break
+				case ResetRequestType.PIN:
+					accountProvider = AccountProvider.PIN
+					break
+			}
+
+			const hash = await bcrypt.hash(credential, 12)
+			await authStore.updateAccount(
+				updatedResetRequest.userId,
+				accountProvider,
+				accountProvider === AccountProvider.Credential
+					? { passwordHash: hash }
+					: { pinHash: hash },
+				tx,
+			)
+
+			return { resetRequest: updatedResetRequest }
+		})
+
+		return resetRequest
 	},
 }

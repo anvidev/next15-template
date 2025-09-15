@@ -1,5 +1,6 @@
 'use server'
 
+import { ResetAccountProvider } from '@/components/emails/reset-account-provider'
 import { VerifyNewEmail } from '@/components/emails/verify-new-email'
 import { adminAction, authedAction, publicAction } from '@/lib/safe-action'
 import { getServerSchema } from '@/lib/validations'
@@ -10,9 +11,11 @@ import {
 	changePinValidation,
 	createPasswordValidation,
 	createPinValidation,
+	createResetRequestValidation,
 	deleteUserValidation,
 	inviteUsersValidation,
 	resetPinValidation,
+	sendPinResetRequestValidation,
 	signInPasswordValidation,
 	signUpValidation,
 	updateProfileValidation,
@@ -73,7 +76,7 @@ export const verifyAction = publicAction
 	})
 	.action(async ({ parsedInput }) => {
 		const { token } = parsedInput
-		const verification = await authService.confirmVerification(token)
+		const verification = await authService.confirmEmailVerification(token)
 		const newSession = await authService.createSession(
 			verification.userId,
 			SessionPlatform.Web,
@@ -340,4 +343,47 @@ export const changeEmailAction = authedAction
 				token: newEmailVerification.token,
 			}),
 		)
+	})
+
+async function getCreateResetRequestSchema() {
+	return await getServerSchema(createResetRequestValidation, 'validations')
+}
+
+export const createResetRequestAction = publicAction
+	.metadata({ actionName: 'createResetRequestAction' })
+	.inputSchema(getCreateResetRequestSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput }) => {
+		const { email, type } = parsedInput
+		const resetRequest = await authService.createResetRequest(email, type)
+		if (!resetRequest) {
+			console.log('reset request was not created')
+			return
+		}
+		await emailService.sendRecursively(
+			[email],
+			'Reset Request - [PROJ_NAME]',
+			ResetAccountProvider({
+				environment: env.NODE_ENV,
+				token: resetRequest.token,
+				type,
+			}),
+		)
+	})
+
+async function getConsumeResetRequestSchema() {
+	return await getServerSchema(sendPinResetRequestValidation, 'validations')
+}
+
+export const consumeResetRequestAction = publicAction
+	.metadata({ actionName: 'consumeResetRequestAction' })
+	.inputSchema(getConsumeResetRequestSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput }) => {
+		const { token, credential, type } = parsedInput
+		await authService.consumeResetRequest(token, type, credential)
 	})

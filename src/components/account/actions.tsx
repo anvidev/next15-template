@@ -57,8 +57,8 @@ export function Actions({ promise }: Props) {
 				</div>
 			</div>
 			<div className="space-y-3">
-				<p className="text-muted-foreground font-medium text-sm">{tActionsPage("actionsTitleTwo")}</p>
-				<div className="w-full space-y-1 border p-1 shadow-sm bg-card rounded-lg">
+				<p className="text-destructive font-medium text-sm">{tActionsPage("actionsTitleTwo")}</p>
+				<div className="w-full space-y-1 border border-destructive p-1 shadow-sm bg-card rounded-lg">
 					<DangerAccordions />
 				</div>
 			</div>

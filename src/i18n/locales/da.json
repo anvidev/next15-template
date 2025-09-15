@@ -112,7 +112,9 @@
 				"title": "Oprettet",
 				"placeholder": "Vælg datoer"
 			},
-			"deleteAction": "Slet"
+			"deleteAction": "Slet",
+			"resetPinAction": "Nulstil PIN-kode",
+			"resetPasswordAction": "Nulstil adgangskode"
 		}
 	},
 	"accountPage": {

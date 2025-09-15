@@ -112,7 +112,9 @@
 				"title": "Created",
 				"placeholder": "Select dates"
 			},
-			"deleteAction": "Delete"
+			"deleteAction": "Delete",
+			"resetPinAction": "Reset PIN",
+			"resetPasswordAction": "Reset password"
 		}
 	},
 	"accountPage": {

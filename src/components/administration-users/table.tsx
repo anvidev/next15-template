@@ -24,7 +24,7 @@ import {
 } from "../ui/dropdown-menu"
 import { Button } from "../ui/button"
 import { toast } from "sonner"
-import { formatDate, getInitials, sleep } from "@/lib/utils"
+import { formatDate, getInitials } from "@/lib/utils"
 import { Badge } from "../ui/badge"
 import { DataTableDynamicToolbar } from "../data-table/data-table-dynamic-toolbar"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
@@ -32,7 +32,6 @@ import { updateRoleAction, updateStatusAction } from "@/actions/auth"
 import { Loader } from "../common/loader"
 import { emitCustomEvent } from "react-custom-events"
 import { useTranslations } from "next-intl"
-import { DataTableSkeleton } from "../data-table/data-table-skeleton"
 
 interface Props {
 	user: User
@@ -291,6 +290,17 @@ export function Table({ promise, user }: Props) {
 									</DropdownMenuRadioGroup>
 								</DropdownMenuSubContent>
 							</DropdownMenuSub>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+							// onSelect={() => emitCustomEvent('delete-users-dialog', [row])}
+							>
+								{t("usersTable.resetPinAction")}
+							</DropdownMenuItem>
+							<DropdownMenuItem
+							// onSelect={() => emitCustomEvent('delete-users-dialog', [row])}
+							>
+								{t("usersTable.resetPasswordAction")}
+							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
 								onSelect={() => emitCustomEvent('delete-users-dialog', [row])}

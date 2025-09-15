@@ -27,12 +27,12 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 import { Loader } from '../common/loader'
-import { signInValidation } from '@/schemas/auth'
+import { signInPasswordValidation } from '@/schemas/auth'
 
 export function SignInForm() {
 	const router = useRouter()
 	const tValidations = useTranslations("validations")
-	const signInSchema = signInValidation(tValidations)
+	const signInSchema = signInPasswordValidation(tValidations)
 	const { execute, isExecuting } = useAction(signInAction, {
 		onError({ error }) {
 			toast(error.serverError)

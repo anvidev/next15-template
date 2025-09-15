@@ -25,13 +25,13 @@ import {
 import { toast } from "sonner"
 import { useState } from "react"
 import { Loader } from "../common/loader"
-import { FormDebug } from "../common/form-debug"
 
 interface Props {
 	user: User
 }
 
 export function Display({ user }: Props) {
+	const tAccountPage = useTranslations("accountPage")
 	const [open, setOpen] = useState(false)
 	const { execute, isExecuting } = useAction(updateOwnProfileAction, {
 		onError(args) {
@@ -66,10 +66,14 @@ export function Display({ user }: Props) {
 							src={user.image as string}
 							alt={user.name}
 						/>
-						<AvatarFallback className='rounded-lg uppercase'>{getInitials(user.name)}</AvatarFallback>
+						<AvatarFallback className='rounded-lg uppercase'>
+							{getInitials(user.name)}
+						</AvatarFallback>
 					</Avatar>
 				}>
-				<p className="text-sm text-muted-foreground">Dette er din offentlige profil som andre brugere og admins kan se</p>
+				<p className="text-sm text-muted-foreground">
+					{tAccountPage("userAccordion.textOne")}
+				</p>
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(execute)} className="flex flex-col items-center gap-3">
@@ -78,9 +82,11 @@ export function Display({ user }: Props) {
 							name="name"
 							render={({ field }) => (
 								<FormItem className="w-full">
-									<FormLabel>Navn</FormLabel>
+									<FormLabel>{tAccountPage("userAccordion.name")}</FormLabel>
 									<FormControl>
-										<Input placeholder="Skriv dit navn..." {...field} />
+										<Input
+											placeholder={tAccountPage("userAccordion.namePlaceholder")}
+											{...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -91,12 +97,14 @@ export function Display({ user }: Props) {
 							name="image"
 							render={({ field }) => (
 								<FormItem className="w-full">
-									<FormLabel>Billede</FormLabel>
+									<FormLabel>{tAccountPage("userAccordion.image")}</FormLabel>
 									<FormControl>
-										<Input placeholder="Indsæt en gyldig billed-URL" {...field} />
+										<Input
+											placeholder={tAccountPage("userAccordion.imagePlaceholder")}
+											{...field} />
 									</FormControl>
 									<FormDescription>
-										Indsæt en gyldig billed-URL. Kun jpg, jpeg, png og gif understøttes
+										{tAccountPage("userAccordion.imageDescription")}
 									</FormDescription>
 									<FormMessage />
 								</FormItem>
@@ -107,7 +115,7 @@ export function Display({ user }: Props) {
 							type="submit"
 							className="w-full">
 							{isExecuting && <Loader />}
-							Opdater
+							{tAccountPage("userAccordion.updateButton")}
 						</Button>
 					</form>
 				</Form>

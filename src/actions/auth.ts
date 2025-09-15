@@ -1,16 +1,17 @@
 'use server'
 
-import { ResetAccountProvider } from '@/components/emails/reset-account-provider'
 import { adminAction, authedAction, publicAction } from '@/lib/safe-action'
 import { getServerSchema } from '@/lib/validations'
 import {
 	acceptAndRegisterValidation,
+	changePasswordValidation,
+	changePinValidation,
+	createPasswordValidation,
 	createPinValidation,
-	createVerificationValidation,
 	deleteUserValidation,
 	inviteUsersValidation,
 	resetPinValidation,
-	signInValidation,
+	signInPasswordValidation,
 	signUpValidation,
 	updateProfileValidation,
 	updateUserRoleValidation,
@@ -18,11 +19,9 @@ import {
 	verifyValidation,
 } from '@/schemas/auth'
 import { authService } from '@/service/auth/service'
-import { emailService } from '@/service/emails/emails'
 import { SessionPlatform } from '@/store/auth/models'
 import { flattenValidationErrors } from 'next-safe-action'
 import { revalidatePath } from 'next/cache'
-import { env } from 'process'
 
 async function getSignUpSchema() {
 	return getServerSchema(signUpValidation, 'validations')
@@ -39,7 +38,7 @@ export const signUpAction = publicAction
 	})
 
 async function getSignInSchema() {
-	return await getServerSchema(signInValidation, 'validations')
+	return await getServerSchema(signInPasswordValidation, 'validations')
 }
 
 export const signInAction = publicAction
@@ -49,7 +48,8 @@ export const signInAction = publicAction
 			flattenValidationErrors(ve).fieldErrors,
 	})
 	.action(async ({ parsedInput }) => {
-		const authorized = await authService.authorizeCredentials(parsedInput)
+		const { email, password } = parsedInput
+		const authorized = await authService.authorizeCredentials(email, password)
 		const newSession = await authService.createSession(
 			authorized.id,
 			SessionPlatform.Web,
@@ -215,31 +215,6 @@ export const deleteOwnUserAction = authedAction
 		await authService.deleteUser(user.id, tenant.id)
 	})
 
-async function getCreateVerificationSchema() {
-	return await getServerSchema(createVerificationValidation, 'validations')
-}
-
-export const resetAccountProviderAction = authedAction
-	.metadata({ actionName: 'resetAccountProviderAction' })
-	.inputSchema(getCreateVerificationSchema, {
-		handleValidationErrorsShape: async ve =>
-			flattenValidationErrors(ve).fieldErrors,
-	})
-	.action(async ({ parsedInput, ctx }) => {
-		const { type } = parsedInput
-		const { user } = ctx
-		const verification = await authService.createVerification(user.id, type)
-		await emailService.sendRecursively(
-			[user.email],
-			`Reset ${type} provider`,
-			ResetAccountProvider({
-				environment: env.NODE_ENV,
-				token: verification.token,
-				type,
-			}),
-		)
-	})
-
 async function getUpdateOwnProfileSchema() {
 	return await getServerSchema(updateProfileValidation, 'validations')
 }
@@ -269,4 +244,57 @@ export const resetPinAction = publicAction
 	.inputSchema(getResetPinSchema)
 	.action(async ({ parsedInput }) => {
 		const { token, pin } = parsedInput
+	})
+
+async function getChangePinSchema() {
+	return await getServerSchema(changePinValidation, 'validations')
+}
+
+export const changeOwnPinAction = authedAction
+	.metadata({ actionName: 'changeOwnPinAction' })
+	.inputSchema(getChangePinSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput, ctx }) => {
+		const { currentPin, newPin } = parsedInput
+		const { user, locale } = ctx
+		await authService.authorizePin(user.email, currentPin)
+		await authService.updatePin(user.id, newPin)
+		revalidatePath(`/${locale}/account`)
+	})
+
+async function getChangeOwnPasswordSchema() {
+	return await getServerSchema(changePasswordValidation, 'validations')
+}
+
+export const changeOwnPasswordAction = authedAction
+	.metadata({ actionName: 'changeOwnPasswordAction' })
+	.inputSchema(getChangeOwnPasswordSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput, ctx }) => {
+		const { currentPassword, newPassword } = parsedInput
+		const { user, locale } = ctx
+		await authService.authorizeCredentials(user.email, currentPassword)
+		await authService.updatePassword(user.id, newPassword)
+		revalidatePath(`/${locale}/account`)
+	})
+
+async function getCreatePasswordSchema() {
+	return await getServerSchema(createPasswordValidation, 'validations')
+}
+
+export const createPasswordAction = authedAction
+	.metadata({ actionName: 'createPasswordAction' })
+	.inputSchema(getCreatePasswordSchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput, ctx }) => {
+		const { user, locale } = ctx
+		const { password } = parsedInput
+		await authService.createPassword(user.id, password)
+		revalidatePath(`/${locale}/account`)
 	})

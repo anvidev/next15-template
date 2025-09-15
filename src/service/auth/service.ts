@@ -3,7 +3,7 @@ import { EmailTemplate } from '@/components/emails/verify-email'
 import { db } from '@/lib/database/connection'
 import { ApplicationError } from '@/lib/safe-action'
 import { generateRandomString, slugify } from '@/lib/utils'
-import { ListUsersFilters, SignInInput, SignUpInput } from '@/schemas/auth'
+import { ListUsersFilters, SignUpInput } from '@/schemas/auth'
 import { authStore } from '@/store/auth/data'
 import {
 	Account,
@@ -74,9 +74,10 @@ export const authService = {
 
 		return { session, user, tenant }
 	}),
-	authorizeCredentials: async function (input: SignInInput): Promise<User> {
-		const { email, password } = input
-
+	authorizeCredentials: async function (
+		email: string,
+		password: string,
+	): Promise<User> {
 		const user = await authStore.getUserByEmail(email)
 		if (!user) {
 			throw new ApplicationError(
@@ -134,6 +135,80 @@ export const authService = {
 		}
 
 		return user
+	},
+	authorizePin: async function (email: string, pin: number): Promise<User> {
+		const user = await authStore.getUserByEmail(email)
+		if (!user) {
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{ message: 'User was not found', email },
+			)
+		}
+
+		if (!user.active) {
+			throw new ApplicationError('User is deactivated', 'Service: Forbidden', {
+				message: 'User is deactivated',
+				email,
+			})
+		}
+
+		if (!user.emailVerified) {
+			throw new ApplicationError(
+				'User has not verified their email',
+				'Service: Forbidden',
+				{ message: 'Users email is not verified', email },
+			)
+		}
+
+		const account = await authStore.getAccount(user.id, AccountProvider.PIN)
+		if (!account) {
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{
+					message: 'Account was not found',
+					email,
+					provider: AccountProvider.PIN,
+				},
+			)
+		}
+		if (!account.pinHash) {
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{ message: 'Account has no pin hash', email },
+			)
+		}
+
+		const samePin = await bcrypt.compare(pin.toString(), account.pinHash)
+		if (!samePin) {
+			throw new ApplicationError(
+				'Invalid credentials',
+				'Service: Unauthorized',
+				{ message: 'Incorrect pin', email },
+			)
+		}
+
+		return user
+	},
+	updatePin: async function (
+		userId: User['id'],
+		pin: number,
+	): Promise<Account> {
+		const pinHash = await bcrypt.hash(pin.toString(), 12)
+		return await authStore.updateAccount(userId, AccountProvider.PIN, {
+			pinHash,
+		})
+	},
+	updatePassword: async function (
+		userId: User['id'],
+		password: string,
+	): Promise<Account> {
+		const passwordHash = await bcrypt.hash(password, 12)
+		return await authStore.updateAccount(userId, AccountProvider.Credential, {
+			passwordHash,
+		})
 	},
 	createSession: async function (
 		id: User['id'],
@@ -470,6 +545,19 @@ export const authService = {
 		const account = await authStore.createAccount({
 			id: generateRandomString(32, 'account_'),
 			provider: AccountProvider.PIN,
+			userId: userId,
+			pinHash: passwordHash,
+		})
+		return account
+	},
+	createPassword: async function (
+		userId: User['id'],
+		password: string,
+	): Promise<Account> {
+		const passwordHash = await bcrypt.hash(password, 12)
+		const account = await authStore.createAccount({
+			id: generateRandomString(32, 'account_'),
+			provider: AccountProvider.Credential,
 			userId: userId,
 			pinHash: passwordHash,
 		})

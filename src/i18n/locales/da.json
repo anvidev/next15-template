@@ -36,7 +36,12 @@
 		"invalid": "Ugyldig værdi",
 		"enum": "Vælg venligst fra listen",
 		"boolean": "Værdi skal være sandt eller falsk",
-		"url": "Skal være en gyldig url"
+		"url": "Skal være en gyldig url",
+		"length": "Skal være {number} karakterer langt",
+		"pinCodeMismatch": "PIN-koder er ikke ens",
+		"pinCodeSame": "Ny PIN-kode er ens med nuværende",
+		"passwordMismatch": "Adgangskode er ikke ens",
+		"passwordSame": "Ny adgangskode er ens med nuværende"
 	},
 	"home": {
 		"title": "Hej verden!"
@@ -111,6 +116,68 @@
 		}
 	},
 	"accountPage": {
-		"title": "Profil"
+		"title": "Profil",
+		"actionsTitleOne": "Sikkerhed",
+		"actionsTitleTwo": "Farezone",
+		"emailAccordion": {
+			"title": "Opdater email",
+			"description": "Modtag et link til at ændre email",
+			"textOne": "Du får tilsendt en mail med et link, hvor du kan ændre din email.Du får tilsendt en mail med et link, hvor du kan ændre din email.",
+			"textTwo": "Linket er aktive i 1 time."
+		},
+		"passwordAccordion": {
+			"updateTitle": "Opdater adgangskode",
+			"updateDescription": "Vælg en adgangskode til din konto",
+			"updateTextOne": "Indtast din nuværende adgangskode og derefter den nye for at bekræfte ændringen",
+			"updateButton": "Opdater",
+			"createTitle": "Opret adgangskode",
+			"createDescription": "Indtast en adgangskode på minimum 8 karaterer",
+			"createTextOne": "Indtast din nuværende adgangskode og derefter den nye for at bekræfte ændringen",
+			"createButton": "Opret",
+			"password": "Adgangskode",
+			"passwordPlaceholder": "Vælg en adgangskode",
+			"currentPassword": "Nuværende adgangskode",
+			"currentPasswordPlaceholder": "Indtast din nuværende adgangskode",
+			"newPassword": "Ny adgangskode",
+			"newPasswordPlaceholder": "Indtast ny adgangskode",
+			"confirmPassword": "Bekræft adgangskode",
+			"confirmPasswordPlaceholder": "Indtast ny adgangskode igen"
+		},
+		"pinAccordion": {
+			"updateTitle": "Opdater PIN-kode",
+			"updateDescription": "Vælg en ny 4-cifret PIN-kode til din konto",
+			"updateTextOne": "Indtast din nuværende PIN-kode og derefter den nye for at bekræfte ændringen",
+			"updateButton": "Opdater",
+			"createTitle": "Opret PIN-kode",
+			"createDescription": "Modtag et link til at ændre email",
+			"createTextOne": "Indtast din nuværende adgangskode og derefter den nye for at bekræfte ændringen",
+			"createButton": "Opret",
+			"pin": "PIN-kode",
+			"pinPlaceholder": "Vælg en PIN-kode",
+			"pinDescription": "Din PIN-kode er krypteret og sikkert gemt.",
+			"currentPin": "Nuværende PIN-kode",
+			"currentPinPlaceholder": "Indtast din nuværende PIN-kode",
+			"newPin": "Ny PIN-kode",
+			"newPinPlaceholder": "Indtast ny PIN-kode",
+			"confirmPin": "Bekræft PIN-kode",
+			"confirmPinPlaceholder": "Indtast ny PIN-kode igen"
+
+		},
+		"dangerAccordion": {
+			"title": "Slet konto",
+			"description": "Fjern al din data permanent",
+			"textOne": "Denne handling er permanent og kan ikke fortrydes.",
+			"textTwo": "Bekræft ved at skrive <strong>Slet konto</strong> for at slette din konto.",
+			"deleteButton": "Slet"
+		},
+		"userAccordion": {
+			"textOne": "Dette er din offentlige profil som andre brugere og admins kan se",
+			"name": "Navn",
+			"namePlaceholder": "Skriv dit navn...",
+			"image": "Billede",
+			"imagePlaceholder": "Indsæt en gyldig billed-URL",
+			"imageDescription": "Indsæt en gyldig billed-URL. Kun jpg, jpeg, png og gif understøttes",
+			"updateButton": "Opdater"
+		}
 	}
 }

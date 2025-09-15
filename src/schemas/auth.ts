@@ -1,6 +1,6 @@
 import { TFunc } from '@/i18n/types'
 import { getSortingStateParser } from '@/lib/date-table/parsers'
-import { Role, rolesSchema, User, VerificationType } from '@/store/auth/models'
+import { Role, rolesSchema, User } from '@/store/auth/models'
 import {
 	createLoader,
 	parseAsArrayOf,
@@ -11,7 +11,7 @@ import {
 } from 'nuqs/server'
 import z from 'zod'
 
-export function signInValidation(t: TFunc) {
+export function signInPasswordValidation(t: TFunc) {
 	return z.object({
 		email: z.email({ error: t('email') }),
 		password: z
@@ -19,7 +19,17 @@ export function signInValidation(t: TFunc) {
 			.min(8, { error: t('min', { number: 8 }) }),
 	})
 }
-export type SignInInput = z.infer<ReturnType<typeof signInValidation>>
+export type SignInPasswordInput = z.infer<
+	ReturnType<typeof signInPasswordValidation>
+>
+
+export function signInPinValidation(t: TFunc) {
+	return z.object({
+		email: z.email({ error: t('email') }),
+		pin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+	})
+}
+export type SignInPinInput = z.infer<ReturnType<typeof signInPinValidation>>
 
 export function signUpValidation(t: TFunc) {
 	return z.object({
@@ -114,21 +124,11 @@ export type UpdateUserStatusInput = z.infer<
 
 export function createPinValidation(t: TFunc) {
 	return z.object({
-		pin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+		pin: z.transform(Number).pipe(z.coerce.number({ error: t('invalid') })),
 	})
 }
 
 export type CreatePinInput = z.infer<ReturnType<typeof createPinValidation>>
-
-export function createVerificationValidation(t: TFunc) {
-	return z.object({
-		type: z.enum(VerificationType, { error: t('enum') }),
-	})
-}
-
-export type CreateVerificationInput = z.infer<
-	ReturnType<typeof createVerificationValidation>
->
 
 export function updateProfileValidation(t: TFunc) {
 	return z.object({
@@ -149,3 +149,114 @@ export function resetPinValidation(t: TFunc) {
 }
 
 export type ResetPinInput = z.infer<ReturnType<typeof resetPinValidation>>
+
+export function changePinValidation(t: TFunc) {
+	return z
+		.object({
+			currentPin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+			newPin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+			confirmPin: z.transform(Number).pipe(z.number({ error: t('invalid') })),
+		})
+		.superRefine((val, ctx) => {
+			const PIN_LENGTH = 4
+			if (val.currentPin.toString().length !== PIN_LENGTH) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('length', { number: PIN_LENGTH }),
+					input: val,
+					path: ['currentPin'],
+				})
+			}
+			if (val.newPin.toString().length !== PIN_LENGTH) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('length', { number: PIN_LENGTH }),
+					input: val,
+					path: ['newPin'],
+				})
+			}
+			if (val.confirmPin.toString().length !== PIN_LENGTH) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('length', { number: PIN_LENGTH }),
+					input: val,
+					path: ['confirmPin'],
+				})
+			}
+			if (val.newPin !== val.confirmPin) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('pinCodeMismatch'),
+					input: val,
+					path: ['confirmPin'],
+				})
+			}
+			if (val.newPin === val.currentPin) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('pinCodeSame'),
+					input: val,
+					path: ['newPin'],
+				})
+			}
+		})
+}
+
+export type ChangePinInput = z.infer<ReturnType<typeof changePinValidation>>
+
+export function changePasswordValidation(t: TFunc) {
+	return z
+		.object({
+			currentPassword: z.string({ error: t('required') }),
+			newPassword: z
+				.string({ error: t('required') })
+				.min(8, { error: t('min', { number: 8 }) })
+				.max(32, { error: t('max', { number: 32 }) }),
+			confirmPassword: z
+				.string({ error: t('required') })
+				.min(8, { error: t('min', { number: 8 }) })
+				.max(32, { error: t('max', { number: 32 }) }),
+		})
+		.superRefine((val, ctx) => {
+			if (val.newPassword !== val.confirmPassword) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('passwordMismatch'),
+					input: val,
+					path: ['confirmPassword'],
+				})
+			}
+			if (val.newPassword === val.currentPassword) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('passwordSame'),
+					input: val,
+					path: ['newPassword'],
+				})
+			}
+		})
+}
+
+export function createPasswordValidation(t: TFunc) {
+	return z
+		.object({
+			password: z
+				.string({ error: t('required') })
+				.min(8, { error: t('min', { number: 8 }) })
+				.max(32, { error: t('max', { number: 32 }) }),
+			confirmPassword: z
+				.string({ error: t('required') })
+				.min(8, { error: t('min', { number: 8 }) })
+				.max(32, { error: t('max', { number: 32 }) }),
+		})
+		.superRefine((val, ctx) => {
+			if (val.password !== val.confirmPassword) {
+				ctx.addIssue({
+					code: 'custom',
+					message: t('passwordMismatch'),
+					input: val,
+					path: ['confirmPassword'],
+				})
+			}
+		})
+}

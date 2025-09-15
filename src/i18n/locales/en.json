@@ -36,7 +36,12 @@
 		"invalid": "Value is not a valid one",
 		"enum": "Choose from the list",
 		"boolean": "Must be either true or false",
-		"url": "Must be a valid url"
+		"url": "Must be a valid url",
+		"length": "Must be {number} characters long",
+		"pinCodeMismatch": "PIN codes does not match",
+		"pinCodeSame": "New PIN code is the same as current",
+		"passwordMismatch": "Passwords does not match",
+		"passwordSame": "New password is the same as current"
 	},
 	"home": {
 		"title": "Hello world!"
@@ -111,6 +116,67 @@
 		}
 	},
 	"accountPage": {
-		"title": "Account"
+		"title": "Account",
+		"actionsTitleOne": "Security",
+		"actionsTitleTwo": "Danger Zone",
+		"emailAccordion": {
+			"title": "Update Email",
+			"description": "Receive a link to change your email",
+			"textOne": "You will receive an email with a link where you can change your email.",
+			"textTwo": "The link is active for 1 hour."
+		},
+		"passwordAccordion": {
+			"updateTitle": "Update Password",
+			"updateDescription": "Choose a password for your account",
+			"updateTextOne": "Enter your current password and then the new one to confirm the change",
+			"updateButton": "Update",
+			"createTitle": "Create Password",
+			"createDescription": "Enter a password of at least 8 characters",
+			"createTextOne": "Enter your current password and then the new one to confirm the change",
+			"createButton": "Create",
+			"password": "Password",
+			"passwordPlaceholder": "Choose a password",
+			"currentPassword": "Current Password",
+			"currentPasswordPlaceholder": "Enter your current password",
+			"newPassword": "New Password",
+			"newPasswordPlaceholder": "Enter new password",
+			"confirmPassword": "Confirm Password",
+			"confirmPasswordPlaceholder": "Enter new password again"
+		},
+		"pinAccordion": {
+			"updateTitle": "Update PIN",
+			"updateDescription": "Choose a new 4-digit PIN for your account",
+			"updateTextOne": "Enter your current PIN and then the new one to confirm the change",
+			"updateButton": "Update",
+			"createTitle": "Create PIN",
+			"createDescription": "Choose a 4-digit PIN for your account",
+			"createTextOne": "Enter your current PIN and then the new one to confirm the change",
+			"createButton": "Create",
+			"pin": "PIN",
+			"pinPlaceholder": "Choose a PIN",
+			"pinDescription": "Your PIN is encrypted and securely stored.",
+			"currentPin": "Current PIN",
+			"currentPinPlaceholder": "Enter your current PIN",
+			"newPin": "New PIN",
+			"newPinPlaceholder": "Enter new PIN",
+			"confirmPin": "Confirm PIN",
+			"confirmPinPlaceholder": "Enter new PIN again"
+		},
+		"dangerAccordion": {
+			"title": "Delete Account",
+			"description": "Permanently remove all your data",
+			"textOne": "This action is permanent and cannot be undone.",
+			"textTwo": "Confirm by typing <strong>Delete Account</strong> to delete your account.",
+			"deleteButton": "Delete"
+		},
+		"userAccordion": {
+			"textOne": "This is your public profile that other users and admins can see.",
+			"name": "Name",
+			"namePlaceholder": "Enter your name...",
+			"image": "Image",
+			"imagePlaceholder": "Paste a valid image URL",
+			"imageDescription": "Paste a valid image URL. Only jpg, jpeg, png, and gif are supported",
+			"updateButton": "Update"
+		}
 	}
 }

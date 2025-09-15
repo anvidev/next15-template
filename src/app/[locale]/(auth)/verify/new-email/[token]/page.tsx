@@ -1,3 +1,4 @@
+import { VerifyNewEmail } from "@/components/auth/verify-new-email"
 import { Loader } from "@/components/common/loader"
 import { authService } from "@/service/auth/service"
 import { Suspense } from "react"
@@ -12,7 +13,7 @@ export default async function Page({
 
 	return (
 		<Suspense fallback={<Loader />}>
-			<div>verify new email</div>
+			<VerifyNewEmail promise={verificationPromise} />
 		</Suspense>
 	)
 }

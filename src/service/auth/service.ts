@@ -373,6 +373,48 @@ export const authService = {
 	confirmVerification: async function (token: string): Promise<Verification> {
 		return authStore.updateVerification(token, { verifiedAt: new Date() })
 	},
+	confirmNewEmailVerification: async function (
+		token: string,
+	): Promise<Verification> {
+		const { verification } = await db.transaction(async tx => {
+			const updatedVerificaton = await authStore.updateVerification(
+				token,
+				{
+					verifiedAt: new Date(),
+				},
+				tx,
+			)
+
+			if (!updatedVerificaton.meta) {
+				throw new ApplicationError(
+					'Meta data is missing from verification',
+					'Service: Internal Server Error',
+					{ verification: updatedVerificaton },
+				)
+			}
+
+			const newEmail = updatedVerificaton.meta['email'] as string | undefined
+			if (!newEmail) {
+				throw new ApplicationError(
+					'New email is missing in meta data from verification',
+					'Service: Internal Server Error',
+					{ verification: updatedVerificaton },
+				)
+			}
+
+			await authStore.updateUser(
+				updatedVerificaton.userId,
+				{
+					email: newEmail,
+				},
+				tx,
+			)
+
+			return { verification: updatedVerificaton }
+		})
+
+		return verification
+	},
 	createVerification: async function (
 		userId: User['id'],
 		type: VerificationType,
@@ -424,21 +466,16 @@ export const authService = {
 	): Promise<{ users: User[]; pageCount: number }> {
 		return await authStore.listUsers(tenantId, filters)
 	},
-	updateUserRole: async function (
-		id: User['id'],
-		tenantId: Tenant['id'],
-		role: Role,
-	): Promise<User> {
-		return await authStore.updateUser(id, tenantId, {
+	updateUserRole: async function (id: User['id'], role: Role): Promise<User> {
+		return await authStore.updateUser(id, {
 			role,
 		})
 	},
 	updateUserStatus: async function (
 		id: User['id'],
-		tenantId: Tenant['id'],
 		active: boolean,
 	): Promise<User> {
-		return await authStore.updateUser(id, tenantId, {
+		return await authStore.updateUser(id, {
 			active,
 		})
 	},
@@ -597,10 +634,9 @@ export const authService = {
 	},
 	updateUserProfile: async function (
 		id: User['id'],
-		tenantId: Tenant['id'],
 		input: Pick<User, 'name' | 'image'>,
 	): Promise<User> {
-		return await authStore.updateUser(id, tenantId, {
+		return await authStore.updateUser(id, {
 			name: input.name,
 			image: input.image,
 		})

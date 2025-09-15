@@ -146,14 +146,14 @@ export const authStore = {
 	},
 	updateUser: async function (
 		id: User['id'],
-		tenantId: Tenant['id'],
+		// tenantId: Tenant['id'],
 		input: Partial<Omit<User, 'id' | 'tenantId'>>,
 		tx: Tx = db,
 	): Promise<User> {
 		const [user] = await tx
 			.update(usersTable)
 			.set({ ...input })
-			.where(and(eq(usersTable.id, id), eq(usersTable.tenantId, tenantId)))
+			.where(and(eq(usersTable.id, id)))
 			.returning()
 		return user
 	},

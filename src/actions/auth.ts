@@ -81,6 +81,17 @@ export const verifyAction = publicAction
 		await authService.setSessionCookie(newSession.token)
 	})
 
+export const verifyNewEmailAction = publicAction
+	.metadata({ actionName: 'verifyNewEmailAction' })
+	.inputSchema(getVerifySchema, {
+		handleValidationErrorsShape: async ve =>
+			flattenValidationErrors(ve).fieldErrors,
+	})
+	.action(async ({ parsedInput }) => {
+		const { token } = parsedInput
+		await authService.confirmNewEmailVerification(token)
+	})
+
 async function getUpdateRoleSchema() {
 	return await getServerSchema(updateUserRoleValidation, 'validations')
 }
@@ -92,11 +103,11 @@ export const updateRoleAction = adminAction
 			flattenValidationErrors(ve).fieldErrors,
 	})
 	.action(async ({ parsedInput, ctx }) => {
-		const { user, tenant, locale } = ctx
+		const { user, locale } = ctx
 		const { ids, role } = parsedInput
 		for (const id of ids) {
 			if (id === user.id) continue
-			await authService.updateUserRole(id, tenant.id, role)
+			await authService.updateUserRole(id, role)
 		}
 		revalidatePath(`/${locale}/administration/users`)
 	})
@@ -186,11 +197,11 @@ export const updateStatusAction = adminAction
 			flattenValidationErrors(ve).fieldErrors,
 	})
 	.action(async ({ parsedInput, ctx }) => {
-		const { user, tenant, locale } = ctx
+		const { user, locale } = ctx
 		const { ids, active } = parsedInput
 		for (const id of ids) {
 			if (user.id === id) continue
-			await authService.updateUserStatus(id, tenant.id, active)
+			await authService.updateUserStatus(id, active)
 		}
 		revalidatePath(`/${locale}/administration/users`)
 	})
@@ -231,8 +242,8 @@ export const updateOwnProfileAction = authedAction
 	})
 	.action(async ({ parsedInput, ctx }) => {
 		const { name, image } = parsedInput
-		const { user, tenant, locale } = ctx
-		await authService.updateUserProfile(user.id, tenant.id, {
+		const { user, locale } = ctx
+		await authService.updateUserProfile(user.id, {
 			name,
 			image: image == '' ? null : image,
 		})

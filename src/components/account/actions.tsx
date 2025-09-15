@@ -466,7 +466,7 @@ function DangerAccordions() {
 				<Input disabled={isExecuting} value={value} onChange={e => setValue(e.target.value)} />
 				<Button
 					variant="destructive"
-					disabled={value.toLowerCase() !== "slet konto" || isExecuting}
+					disabled={value.toLowerCase() !== tAccountPage("dangerAccordion.confirmText") || isExecuting}
 					onClick={() => execute()}>
 					{isExecuting && <Loader />}
 					{tAccountPage("dangerAccordion.deleteButton")}

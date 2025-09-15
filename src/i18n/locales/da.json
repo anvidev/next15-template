@@ -168,6 +168,7 @@
 			"description": "Fjern al din data permanent",
 			"textOne": "Denne handling er permanent og kan ikke fortrydes.",
 			"textTwo": "Bekræft ved at skrive <strong>Slet konto</strong> for at slette din konto.",
+			"confirmText": "slet bruger",
 			"deleteButton": "Slet"
 		},
 		"userAccordion": {

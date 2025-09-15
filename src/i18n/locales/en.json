@@ -167,6 +167,7 @@
 			"description": "Permanently remove all your data",
 			"textOne": "This action is permanent and cannot be undone.",
 			"textTwo": "Confirm by typing <strong>Delete Account</strong> to delete your account.",
+			"confirmText": "delete account",
 			"deleteButton": "Delete"
 		},
 		"userAccordion": {
